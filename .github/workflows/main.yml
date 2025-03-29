@@ -1,0 +1,133 @@
+name: build-and-publish
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - run: npm install
+      - run: npm run build
+
+  generate-attestation:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+      packages: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - run: npm install
+      - run: npm run build
+      - name: Generate Artifact Attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'build/'
+          predicate-type: 'https://slsa.dev/provenance/v1'
+          signature-format: 'sigstore'
+          generator-id: 'https://github.com/xiaomizhoubaobei/MZAPI'
+          sign-material: true
+          verify-material: true
+          verify-conditions: true
+          verify-builder: true
+      - name: Extract Attestation URLs
+        id: extract_urls
+        run: |
+          attestation_url=$(echo ${{ github.event.workflow_run.attestations_url }} | sed 's/\/attestations\//\/attestations\/sha256-/')
+          sigstore_url=$(echo ${{ github.event.workflow_run.attestations_url }} | sed 's/\/attestations\//\/sigstore\/sha256-/')
+  publish-npm:
+    needs: generate-attestation
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  create-github-release:
+    needs: generate-attestation
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - name: Get version from package.json
+        id: get_version
+        run: echo ::set-output name=version::$(node -p "require('./package.json').version")
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            # 🎉 发布新版本 v${{ steps.get_version.outputs.version }} 🎉
+
+            ## 📦 基本信息
+            - **项目名称**: MZAPI
+            - **版本号**: v${{ steps.get_version.outputs.version }}
+            - **发布时间**: ${{ github.event.pull_request.merged_at }}
+
+            ## 📝 更新内容
+            ### ⚠️ Breaking Changes
+            ${{ contains(github.event.pull_request.labels.*.name, 'breaking') && github.event.pull_request.body || '本次更新无Breaking Changes' }}
+
+            ### ✨ 新特性
+            ${{ contains(github.event.pull_request.labels.*.name, 'feature') && github.event.pull_request.body || '本次更新无新特性' }}
+
+            ### 🐛 Bug修复
+            ${{ contains(github.event.pull_request.labels.*.name, 'bug') && github.event.pull_request.body || '本次更新无Bug修复' }}
+
+            ### 📝 其他更新
+            - **PR标题**: ${{ github.event.pull_request.title }}
+            - **PR描述**: ${{ github.event.pull_request.body }}
+            - **提交信息**: ${{ github.event.head_commit.message }}
+
+            ## 📥 安装
+            ```bash
+            npm install mzapi@${{ steps.get_version.outputs.version }}
+            ```
+            ## 👥 贡献者
+            感谢 [@${{ github.event.pull_request.user.login }}](https://github.com/${{ github.event.pull_request.user.login }}) 的贡献！
+
+            ## 📚 相关链接
+            - [Pull Request #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})
+            - [文档](https://api.mizhoubaobei.top)
+            - [更新日志](https://github.com/xiaomizhoubaobei/MZAPI/CHANGELOG.md)
+            - [贡献指南](https://github.com/xuiaomizhoubaobei/MZAPI/CONTRIBUTING.md)
+            - [问题反馈](https://github.com/xiaomizhoubaobei/MZAPI/issues)
+
+            ## 🔒 安全性说明
+            此次发布的软件包已通过 GitHub Actions 生成了项目证明（Artifact Attestation），并使用了 Sigstore 项目来确保软件的来源和完整性。
+
+            ### 验证链接
+
+            你可以通过以下步骤验证项目证明：
+
+            1. 安装 GitHub CLI 工具：`npm install -g gh`
+            2. 使用以下命令验证项目证明：`gh attestation verify dist/ -R ${{ github.repository }}`
+
+            这个命令会检查软件包的签名，确保它是由我们的仓库生成的。如果验证通过，说明你下载的软件包是安全可靠的，没有被篡改过。
+          files: |
+            build/
+          token: ${{ secrets.TOKEN }}

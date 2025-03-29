@@ -1,0 +1,90 @@
+name: "CodeQL Advanced"
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        include:
+          - language: javascript-typescript
+            build-mode: none
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+      - name: Post Analysis Results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: results.sarif
+          wait-for-processing: true
+
+      - name: Add PR Comment
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const sarif = JSON.parse(fs.readFileSync('results.sarif', 'utf8'));
+            
+            let comment = '## CodeQL 安全分析报告 🔍\n\n';
+            
+            const results = sarif.runs[0].results || [];
+            if (results.length === 0) {
+              comment += '✅ 未发现安全问题\n';
+            } else {
+              comment += `⚠️ 发现 ${results.length} 个潜在问题:\n\n`;
+            
+              results.forEach((result, index) => {
+                const severity = result.level === 'error' ? '高危' : 
+                                result.level === 'warning' ? '中危' : '低危';
+            
+                comment += `${index + 1}. **${severity}**: ${result.message.text}\n`;
+                if (result.locations && result.locations[0]) {
+                  const location = result.locations[0].physicalLocation;
+                  comment += `   📍 位置: ${location.artifactLocation.uri}:${location.region.startLine}\n`;
+                }
+                if (result.message.text.includes('建议')) {
+                  comment += `   💡 修复建议: ${result.message.text.split('建议:')[1]}\n`;
+                }
+                comment += '\n';
+              });
+            }
+            
+            comment += '\n---\n';
+            comment += '详细信息请查看 [安全分析详情](https://github.com/${{ github.repository }}/security/code-scanning)';
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
