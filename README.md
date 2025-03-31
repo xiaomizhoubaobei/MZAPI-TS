@@ -1,21 +1,9 @@
 # MZAPI
 
-![github-graphql-api-open-issues](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/github-graphql-api-open-issues.md)
-![github-graphql-api-open-vulnerabilities](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/github-graphql-api-open-vulnerabilities.md)
-![github-graphql-api-open-pull-requests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/github-graphql-api-open-pull-requests.md)
-![github-graphql-api-forks](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/github-graphql-api-forks.md)
-![github-graphql-api-stars](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/github-graphql-api-stars.md)
-![npm-package-version](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/npm-package-version.md)
-![npm-package-license](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/npm-package-license.md)
-![npm-package-size-unpacked](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/npm-package-size-unpacked.md)
-![npm-package-size-minified](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/npm-package-size-minified.md)
-![npm-package-size-minified-gzip](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/npm-package-size-minified-gzip.md)
-![npm-package-dependency-count](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/npm-package-dependency-count.md)
-![npm-package-downloads](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/peterrhodesdev/build-a-badge/npm-package-downloads.md)
 
 ## 项目概述
 
-MZAPI 是一个专为 JavaScript 开发者设计的 SDK，旨在简化与多种 API 服务的集成过程。目前主要提供百度文心大模型API的接入功能，让开发者能够高效、便捷地执行各类使用API得任务。
+MZAPI 是一个专为 TypeScript 开发者设计的 SDK，旨在简化与多种 API 服务的集成过程。目前主要提供百度文心大模型API的接入功能，让开发者能够高效、便捷地执行各类使用API得任务。
 
 ## 功能特性
 
@@ -55,7 +43,7 @@ npm install MZAPI
 
 1. **Fork 仓库**：
    - 首先，在 GitHub 上 Fork 本项目至您的个人仓库。
-   Github仓库地址：https://github.com/xiaomizhoubaobei/MZAPI-JS
+     Github仓库地址：https://github.com/xiaomizhoubaobei/MZAPI-TS
 
 2. **创建特性分支**：
    - 使用命令 `git checkout -b feature/YourFeatureName` 创建一个新的特性分支。

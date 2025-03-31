@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.26.0",
+    "@eslint/config-array": "^0.20.0",
     "@huaweicloud/huaweicloud-sdk-core": "^3.1.140",
     "@huaweicloud/huaweicloud-sdk-kms": "^3.1.128",
     "axios": "^1.8.4",
@@ -24,6 +25,7 @@
     "express": "^4.21.2",
     "jaeger-client": "^3.19.0",
     "json": "^11.0.0",
+    "lru-cache": "^11.1.0",
     "pnpm": "^10.6.5",
     "ts-node": "^10.9.2"
   },
@@ -62,7 +64,8 @@
     "SDK",
     "XMZ",
     "JavaScript",
-    "API"
+    "API",
+    "TypeScript"
   ],
   "author": {
     "name": "小米粥",
