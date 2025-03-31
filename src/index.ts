@@ -7,7 +7,4 @@
  */
 
 // 导出类模型实现
-export {Message} from './MB/ulis/base';
-
-// 动态导出所有模型
-export * from './MB';
+export {Message} from './MB/base';
