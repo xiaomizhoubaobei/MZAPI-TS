@@ -25,6 +25,19 @@ export type ModelType =
     // Mixtral 系列
     | 'mixtral-8x7b-instruct'
 
+    // Llama 系列
+    | 'llama-2-7b'
+    | 'llama-2-13b'
+    | 'llama-2-70b'
+    | 'llama-3-8b'
+    | 'llama-3-70b'
+    | 'qianfan-chinese-llama-2-7b'
+    | 'qianfan-chinese-llama-2-13b'
+    | 'qianfan-chinese-llama-2-70b'
+
+    //ChatGLM 系列
+    | 'chatglm2-6b-32k'
+
     // Speed 系列
     | 'ernie-speed-8k'
     | 'ernie-speed-128k'
@@ -43,6 +56,14 @@ export type ModelType =
     | 'ernie-functions-8k'
     | 'ernie-novel-8k'
     | 'ernie-tiny-8k'
+    | 'xuanyuan-70b-chat'
+
+    // Aquila系列
+    | 'aquilachat-7b'
+
+    // Bloomz系列
+    | 'bloomz-7b1'
+    | 'qianfan-bloomz-7b-compressed'
 
     // 千帆系列
     | 'qianfan-dynamic-8k'
@@ -95,7 +116,23 @@ export function getModelBaseUrl(modelName: ModelType): string {
         // Gemma 系列
         'gemma-7b-it': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/gemma_7b_it',
         // Mixtral 系列
-        'mixtral-8x7b-instruct': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/mixtral_8x7b_instruct'
+        'mixtral-8x7b-instruct': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/mixtral_8x7b_instruct',
+        // Llama 系列
+        'llama-2-7b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/llama_2_7b',
+        'llama-2-13b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/llama_2_13b',
+        'llama-2-70b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/llama_2_70b',
+        'qianfan-chinese-llama-2-7b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/qianfan_chinese_llama_2_7b',
+        'qianfan-chinese-llama-2-13b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/qianfan_chinese_llama_2_13b',
+        'qianfan-chinese-llama-2-70b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/qianfan_chinese_llama_2_70b',
+        'llama-3-8b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/llama_3_8b',
+        'llama-3-70b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/llama_3_70b',
+        //ChatGLM 系列
+        'chatglm2-6b-32k': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/chatglm2_6b_32k',
+        'xuanyuan-70b-chat': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/xuanyuan_70b_chat',
+        'aquilachat-7b': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/aquilachat_7b',
+        // Bloomz系列
+        'bloomz-7b1': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/bloomz_7b1',
+        'qianfan-bloomz-7b-compressed': 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/qianfan_bloomz_7b_compressed',
     };
 
     const baseUrl = baseUrlMap[modelName];

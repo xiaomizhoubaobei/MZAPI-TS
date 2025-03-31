@@ -8,3 +8,4 @@
 
 // 导出类模型实现
 export {Message} from './MB/base';
+export {ERNIE} from './MB/ERNIE';
