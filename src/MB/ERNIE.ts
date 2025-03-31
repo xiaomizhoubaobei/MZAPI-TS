@@ -154,10 +154,6 @@ export class ERNIE extends BaiduERNIEBase {
             // Lite 系列
             'ernie-lite-8k',
             'ernie-lite-pro-128k',
-            // 其他系列
-            'ernie-functions-8k',
-            'ernie-novel-8k',
-            'ernie-tiny-8k',
             // 千帆系列
             'qianfan-dynamic-8k',
             'qianfan-agent-speed-8k',
@@ -166,7 +162,27 @@ export class ERNIE extends BaiduERNIEBase {
             // Yi 系列
             'yi-34b-chat',
             // Mixtral 系列
-            'mixtral-8x7b-instruct'
+            'mixtral-8x7b-instruct',
+            // Llama 系列
+            'llama-2-7b',
+            'llama-2-13b',
+            'qianfan-chinese-llama-2-7b',
+            'qianfan-chinese-llama-2-13b',
+            'qianfan-chinese-llama-2-70b',
+            'llama-3-8b',
+            'llama-3-70b',
+            // ChatGLM 系列
+            'chatglm2-6b-32k',
+            // 其他系列
+            'ernie-functions-8k',
+            'ernie-novel-8k',
+            'ernie-tiny-8k',
+            'xuanyuan-70b-chat',
+            // Aquila系列
+            'aquilachat-7b',
+            'qianfan-bloomz-7b-compressed',
+            // Bloomz系列
+            'bloomz-7b1'
         ];
     }
 
