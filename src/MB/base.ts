@@ -1,5 +1,5 @@
 import axios, {AxiosRequestConfig} from 'axios';
-import BaiduAuth from './baiduauth';
+import BaiduAuth from '../utils/baiduauth';
 import {Log} from "./Log";
 
 /**
