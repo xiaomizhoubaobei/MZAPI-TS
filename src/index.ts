@@ -9,3 +9,6 @@
 // 导出类模型实现
 export {Message} from './MB/base';
 export {ERNIE} from './MB/ERNIE';
+
+// 导出NLP相关类
+export * from './NLP';
