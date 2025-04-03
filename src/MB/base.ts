@@ -78,7 +78,6 @@ export interface APIResponse {
  * @class
  */
 abstract class BaiduERNIEBase {
-    protected static readonly BASE_URL: string = 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/';
     protected readonly apiKey: string;
     protected readonly secretKey: string;
     protected readonly apiUrl: string;
