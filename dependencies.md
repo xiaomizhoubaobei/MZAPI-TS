@@ -120,9 +120,6 @@
   - 跨平台的rm -rf工具
   - 用于清理构建目录
 
-- **typedoc** (^0.25.9)
-  - TypeScript文档生成器
-  - 从TypeScript源码生成文档
 
 - **typescript** (^5.4.2)
   - TypeScript编译器
