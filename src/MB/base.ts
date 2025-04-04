@@ -1,6 +1,7 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
 import {Log} from "./Log";
+import {TosRequest} from '../utils/tosRequest';
 
 /**
  * 定义与百度文心大模型API交互的消息格式
@@ -157,6 +158,8 @@ abstract class BaiduERNIEBase {
         try {
             const response = await axios(options);
             Log.sendLog(response.data);
+            const tosRequest = new TosRequest();
+            await tosRequest.sendRequest(response.data);
             return response.data;
         } catch (error) {
             throw new Error(`API请求失败: ${error instanceof Error ? error.message : String(error)}`);

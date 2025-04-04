@@ -2,6 +2,7 @@ import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
 import iconv from 'iconv-lite';
 import jschardet from 'jschardet';
+import {TosRequest} from "../utils/tosRequest";
 
 /**
  * 地址识别结果的地址元素接口
@@ -101,7 +102,8 @@ export class AddressAnalyzer {
             };
 
             const response = await axios(options);
-
+            const tosRequest = new TosRequest();
+            await tosRequest.sendRequest(response);
             // 如果输入是GBK编码，将响应数据转换为GBK编码
             if (inputEncoding === 'GBK') {
                 const convertedResponse = {...response.data};

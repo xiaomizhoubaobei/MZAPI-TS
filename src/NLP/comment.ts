@@ -1,5 +1,6 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
+import {TosRequest} from "../utils/tosRequest";
 
 /**
  * 评论观点抽取结果项接口
@@ -106,6 +107,8 @@ export class CommentAnalyzer {
 
             const response = await axios(options);
             const data = response.data;
+            const tosRequest = new TosRequest();
+            await tosRequest.sendRequest(response);
 
             return {
                 text: text,
