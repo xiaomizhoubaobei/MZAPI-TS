@@ -1,0 +1,118 @@
+name: Sync to Multiple Repositories
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  sync-to-gitcode:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 设置SSH密钥（Gitcode）
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 接受 GitCode 主机密钥
+        run: |
+          echo -e "Host gitcode.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan gitcode.com >> ~/.ssh/known_hosts
+      - name: 配置Git用户信息（Gitcode）
+        run: |
+          git config --global user.name "xiaomizhou"
+          git config --global user.email "qixiaoxin@stu.sqxy.edu.cn"
+      - name: 添加Gitcode远程仓库
+        run: |
+          git remote add gitcode git@gitcode.com:xiaomizhou/MZAPI-TS.git
+      - name: 同步代码到Gitcode
+        run: |
+          git push gitcode master
+
+  sync-to-gitee:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 设置SSH密钥（Gitee）
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 接受 Gitee 主机密钥
+        run: |
+          echo -e "Host gitee.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan gitee.com >> ~/.ssh/known_hosts
+      - name: 配置Git用户信息（Gitee）
+        run: |
+          git config --global user.name "xiaomizhou"
+          git config --global user.email "2923597244@qq.com"
+      - name: 添加Gitee远程仓库
+        run: |
+          git remote add gitee git@gitee.com:qinjielove/mzapi-ts.git
+      - name: 同步代码到Gitee
+        run: |
+          git push gitee master
+
+  sync-to-Codeup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 设置SSH密钥（Codeup）
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 接受 Codeup 主机密钥
+        run: |
+          echo -e "Host codeup.aliyun.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan codeup.aliyun.com >> ~/.ssh/known_hosts
+      - name: 配置Git用户信息（Codeup）
+        run: |
+          git config --global user.name "祁筱欣" 
+          git config --global user.email "qixiaoxin@stu.sqxy.edu.cn" 
+      - name: 添加远程仓库
+        run: |
+          git remote add gitee git@codeup.aliyun.com:6729fb98ce1b60cfd800d18e/MZAPI-TS.git
+      - name: 同步代码到Codeup
+        run: |
+          git push gitee master
+
+  sync-to-huaweicloud:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 设置SSH密钥（Codeup）
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 接受 huaweicloud 主机密钥
+        run: |
+          echo -e "Host codehub.devcloud.cn-north-4.huaweicloud.com\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan codehub.devcloud.cn-north-4.huaweicloud.com >> ~/.ssh/known_hosts
+      - name: 配置Git用户信息（huaweicloud）
+        run: |
+          git config --global user.name "zhou1314499" 
+          git config --global user.email "qixiaoxin@stu.sqxy.edu.cn" 
+      - name: 添加远程仓库
+        run: |
+          git remote add huaweicloud git@codehub.devcloud.cn-north-4.huaweicloud.com:f62b57ff5e2b4d5ea37c88d2285430cf/MZAPI-TS.git
+      - name: 同步代码到huaweicloud
+        run: |
+          git push huaweicloud master
