@@ -1,6 +1,6 @@
 {
   "name": "mzapi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MZAPI是一个基于typescript的SDK,旨在帮助开发者快速接入各种API服务。通过这个SDK,用户可以轻松地完成各种API调用。",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -29,7 +29,6 @@
     "json": "^11.0.0",
     "lru-cache": "^11.1.0",
     "node-fetch": "^3.3.2",
-    "pnpm": "^10.6.5",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {

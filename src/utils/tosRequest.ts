@@ -4,6 +4,7 @@ import axios, {AxiosRequestConfig} from 'axios';
  * TOS请求体接口定义
  */
 export interface TosRequestData extends Record<string, unknown> {
+    type: string;
 }
 
 /**

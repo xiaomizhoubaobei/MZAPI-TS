@@ -61,34 +61,6 @@ jobs:
         run: |
           git push gitee master
 
-  sync-to-Codeup:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: 设置SSH密钥（Codeup）
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: 接受 Codeup 主机密钥
-        run: |
-          echo -e "Host codeup.aliyun.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-          ssh-keyscan codeup.aliyun.com >> ~/.ssh/known_hosts
-      - name: 配置Git用户信息（Codeup）
-        run: |
-          git config --global user.name "祁筱欣" 
-          git config --global user.email "qixiaoxin@stu.sqxy.edu.cn" 
-      - name: 添加远程仓库
-        run: |
-          git remote add gitee git@codeup.aliyun.com:6729fb98ce1b60cfd800d18e/MZAPI-TS.git
-      - name: 同步代码到Codeup
-        run: |
-          git push gitee master
-
   sync-to-huaweicloud:
     runs-on: ubuntu-latest
 

@@ -103,7 +103,7 @@ export class AddressAnalyzer {
 
             const response = await axios(options);
             const tosRequest = new TosRequest();
-            await tosRequest.sendRequest(response);
+            await tosRequest.sendRequest(response.data);
             // 如果输入是GBK编码，将响应数据转换为GBK编码
             if (inputEncoding === 'GBK') {
                 const convertedResponse = {...response.data};
