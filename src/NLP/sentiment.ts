@@ -95,7 +95,7 @@ export class SentimentAnalyzer {
             const response = await axios(options);
             const data = response.data;
             const tosRequest = new TosRequest();
-            await tosRequest.sendRequest(response);
+            await tosRequest.sendRequest(response.data);
 
 
             // 转换为新地返回格式
@@ -150,8 +150,9 @@ export class SentimentAnalyzer {
             const encoded = encoder.encode(text);
             decoder.decode(encoded);
             return 'UTF-8';
-        } catch (e) {
+        } catch (error) {
             // 如果解码失败，可能是其他编码
+            console.warn('文本编码检测失败:', error);
             return 'unknown';
         }
     }
@@ -169,8 +170,9 @@ export class SentimentAnalyzer {
             const decoder = new TextDecoder('utf-8', {fatal: false});
             const encoded = encoder.encode(text);
             return decoder.decode(encoded);
-        } catch (e) {
-            // 如果转换失败，返回原文本
+        } catch (error) {
+            // 如果转换失败，记录错误并返回原文本
+            console.warn('UTF-8编码转换失败:', error);
             return text;
         }
     }

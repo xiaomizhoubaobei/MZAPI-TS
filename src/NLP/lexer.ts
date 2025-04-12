@@ -3,62 +3,122 @@ import BaiduAuth from '../utils/baiduauth';
 import {TosRequest} from "../utils/tosRequest";
 
 /**
- * 评论观点抽取结果项接口
+ * 词法分析结果项接口
+ *
+ * @remarks
+ * 词性标注缩略说明：
+ * - n: 普通名词
+ * - f: 方位名词
+ * - s: 处所名词
+ * - t: 时间名词
+ * - nr: 人名
+ * - ns: 地名
+ * - nt: 机构团体名
+ * - nw: 作品名
+ * - nz: 其他专名
+ * - v: 普通动词
+ * - vd: 动副词
+ * - vn: 名动词
+ * - a: 形容词
+ * - ad: 副形词
+ * - an: 名形词
+ * - d: 副词
+ * - m: 数量词
+ * - q: 量词
+ * - r: 代词
+ * - p: 介词
+ * - c: 连词
+ * - u: 助词
+ * - xc: 其他虚词
+ * - w: 标点符号
+ *
+ * 专名识别缩略说明：
+ * - PER: 人名
+ * - LOC: 地名
+ * - ORG: 机构名
+ * - TIME: 时间
  */
-interface CommentItem {
+
+/**
+ * 地址成分接口
+ */
+interface LocationDetail {
     /**
-     * 评论观点
+     * 成分类型，如省、市、区、县
      */
-    prop: string;
+    type: string;
     /**
-     * 观点对应的情感倾向
-     * 0：负向
-     * 1：中性
-     * 2：正向
+     * 在item中的字节级offset
      */
-    sentiment: number;
+    byte_offset: number;
     /**
-     * 观点的起始位置
+     * 字节级length
      */
-    begin_pos: number;
-    /**
-     * 观点的结束位置
-     */
-    end_pos: number;
-    /**
-     * 观点对应的情感词
-     */
-    adj: string;
-    /**
-     * 对应于该情感搭配的短句摘要
-     */
-    abstract: string;
+    byte_length: number;
 }
 
-interface CommentResponse {
+/**
+ * 词法分析结果项接口
+ */
+interface LexerItem {
     /**
-     * 输入的文本内容
+     * 词汇的字符串
      */
-    text: string;
+    item: string;
     /**
-     * 评论观点抽取结果数组
+     * 词性，词性标注算法使用。命名实体识别算法中，此项为空串
      */
-    items: CommentItem[];
+    pos: string;
+    /**
+     * 命名实体类型，命名实体识别算法使用。词性标注算法中，此项为空串
+     */
+    ne: string;
+    /**
+     * 在text中的字节级offset
+     */
+    byte_offset: number;
+    /**
+     * 字节级length
+     */
+    byte_length: number;
+    /**
+     * 链指到知识库的URI，只对命名实体有效。对于非命名实体和链接不到知识库的命名实体，此项为空串
+     */
+    uri: string;
+    /**
+     * 词汇的标准化表达，主要针对时间、数字单位，没有归一化表达的，此项为空串
+     */
+    formal: string;
+    /**
+     * 基本词成分
+     */
+    basic_words: string[];
+    /**
+     * 地址成分，非必需，仅对地址型命名实体有效，没有地址成分的，此项为空数组
+     */
+    loc_details: LocationDetail[];
+}
+
+interface LexerResponse {
     /**
      * 日志ID
      */
     log_id: number;
+    /**
+     * 词法分析结果数组
+     */
+    items: LexerItem[];
 }
 
 /**
- * 评论观点抽取类，用于从评论中抽取观点
+ * 词法分析类，用于进行中文分词、词性标注和专名识别
  */
-export class CommentAnalyzer {
+export class LexerAnalyzer {
     private readonly auth: BaiduAuth;
-    private readonly apiUrl: string = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/comment_tag?charset=UTF-8';
+    private readonly apiUrl: string = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/lexer?charset=UTF-8';
 
     /**
-     * 创建评论观点抽取实例
+     * 创建词法分析实例
      * @param {string} apiKey - 百度API的客户端ID
      * @param {string} secretKey - 百度API的客户端密钥
      * @throws {Error} 如果apiKey或secretKey为空，将抛出错误
@@ -67,13 +127,15 @@ export class CommentAnalyzer {
         this.auth = new BaiduAuth(apiKey, secretKey);
     }
 
-    async analyze(text: string, type: number = 4): Promise<CommentResponse> {
+    /**
+     * 对文本进行词法分析
+     * @param {string} text - 待分析的文本内容
+     * @returns {Promise<LexerResponse>} 返回词法分析结果
+     * @throws {Error} 如果文本为空或分析失败，将抛出错误
+     */
+    async analyze(text: string): Promise<LexerResponse> {
         if (!text) {
             throw new Error('文本内容不能为空');
-        }
-
-        if (type < 1 || type > 13) {
-            throw new Error('type参数必须在1-13范围内');
         }
 
         // 检测文本编码并在需要时进行转换
@@ -82,10 +144,10 @@ export class CommentAnalyzer {
             text = this.convertToUTF8(text);
         }
 
-        // 验证文本长度（最大支持2048字节）
+        // 验证文本长度（最大支持20000字节）
         const byteLength = this.getByteLength(text);
-        if (byteLength > 2048) {
-            throw new Error(`文本超过长度限制：${byteLength} 字节（最大允许2048字节）`);
+        if (byteLength > 20000) {
+            throw new Error(`文本超过长度限制：${byteLength} 字节（最大允许20000字节）`);
         }
 
         try {
@@ -93,15 +155,14 @@ export class CommentAnalyzer {
 
             const options: AxiosRequestConfig = {
                 method: 'POST',
-                url: `${this.apiUrl}?access_token=${token}`,
+                url: `${this.apiUrl}?charset=UTF-8&access_token=${token}`,
                 headers: {
                     'Content-Type': 'application/json;charset=UTF-8',
                     'Accept': 'application/json;charset=UTF-8',
                     'Accept-Charset': 'UTF-8'
                 },
                 data: {
-                    text: text,
-                    type: type
+                    text: text
                 }
             };
 
@@ -110,13 +171,9 @@ export class CommentAnalyzer {
             const tosRequest = new TosRequest();
             await tosRequest.sendRequest(response.data);
 
-            return {
-                text: text,
-                items: data.items || [],
-                log_id: data.log_id
-            };
+            return data;
         } catch (error) {
-            throw new Error(`评论观点抽取失败: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`词法分析失败: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
