@@ -116,7 +116,7 @@ export class ERNIE extends BaiduERNIEBase {
             throw new Error('modelName参数不能为空。请提供有效的模型名称，例如："ernie-4.0-8k"、"ernie-4.0-32k"、"ernie-4.0-128k"等。');
         }
         const apiUrl = getModelBaseUrl(modelName);
-        super(apiKey, secretKey, apiUrl);
+        super(apiKey, secretKey, apiUrl, modelName);
     }
 
     /**
