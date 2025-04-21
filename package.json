@@ -13,8 +13,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "lint": "eslint src --ext .ts",
     "test": "jest",
-    "docs": "typedoc",
-    "prepare": "husky install"
+    "docs": "typedoc"
   },
   "dependencies": {
     "@babel/core": "^7.26.0",
