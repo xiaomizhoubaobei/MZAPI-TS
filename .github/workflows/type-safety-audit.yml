@@ -1,0 +1,112 @@
+name: Type Safety Audit
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  type-check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+
+  interface-audit:
+    needs: type-check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - name: Run interface type validation
+        run: npx ts-node src/utils/type-validator.ts
+
+  api-response-audit:
+    needs: interface-audit
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - name: Run API response type matching
+        run: npx ts-node src/utils/api-type-matcher.ts
+
+  generate-report:
+    needs: api-response-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: type-safety-report-${{ matrix.os }}
+          path: reports
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - name: Generate consolidated report
+        run: npx ts-node src/utils/consolidate-reports.ts
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v3
+        with:
+          name: consolidated-type-safety-report
+          path: consolidated-type-safety-report.json
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - name: Generate type safety report
+        run: npx ts-node src/utils/type-report-generator.ts
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: type-safety-report
+          path: type-safety-report.json
+
+  comment-report:
+    needs: generate-report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: type-safety-report
+          path: type-safety-report.json
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - name: Comment report on PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('type-safety-report.json', 'utf8'));
+            const markdown = `### 类型安全检查报告\n\n**类型检查结果**: ${report.typeCheck.passed ? '✅ 通过' : '❌ 失败'}\n\n**接口验证结果**: ${report.interfaceValidation.passed ? '✅ 通过' : '❌ 失败'}\n\n**API响应匹配结果**: ${report.apiMatching.passed ? '✅ 通过' : '❌ 失败'}\n\n**详细报告**:\n\n```json\n${JSON.stringify(report, null, 2)}\n````;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: markdown
+            });
