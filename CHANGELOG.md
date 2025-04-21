@@ -5,6 +5,17 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.2] - 2025-04-21
+
+### 新增
+
+- 新增地址识别模块
+- 添加pre-commit钩子脚本
+
+### 变更
+
+- 更新GitHub Actions工作流配置
+
 ## [0.1.1] - 2025-04-12
 
 ### 新增
