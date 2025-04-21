@@ -131,8 +131,9 @@ jobs:
       - run: npm install
       - run: npm run build
       - name: Login to npm registry
-        run: npm login --registry=https://registry.npmjs.org/ --scope=@your-scope
+        run: npm login --registry=https://registry.npmjs.org/ --scope=@xiaomizhou111
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: always()
       - name: Publish to npm
         run: npm publish
