@@ -87,4 +87,4 @@ jobs:
           git remote add huaweicloud git@codehub.devcloud.cn-north-4.huaweicloud.com:f62b57ff5e2b4d5ea37c88d2285430cf/MZAPI-TS.git
       - name: 同步代码到huaweicloud
         run: |
-          git push huaweicloud master
+          git push huaweicloud master --force

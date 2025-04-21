@@ -25,7 +25,7 @@ let gitRoot;
 try {
   gitRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim();
 } catch (error) {
-  console.error('Error: Failed to determine git repository root.');
+    console.error('错误：无法确定Git仓库根目录。');
   process.exit(1);
 }
 
@@ -44,10 +44,10 @@ try {
 } catch (error) {
   // If diff command fails (e.g., no commits yet), exit cleanly
   if (error.status === 128) {
-      console.log("No initial commit found or other git diff error, skipping pre-commit check.");
+      console.log("未找到初始提交或其他git差异错误，跳过预提交检查。");
       process.exit(0);
   }
-  console.error('Error executing git diff:', error.stderr || error.message);
+    console.error('执行git diff时出错:', error.stderr || error.message);
   process.exit(1);
 }
 
@@ -66,7 +66,7 @@ stagedTsFiles.forEach(relativeFilePath => {
   const absoluteFilePath = path.resolve(gitRoot, relativeFilePath);
 
   if (!fs.existsSync(absoluteFilePath)) {
-    console.warn(`Warning: Staged file not found: ${absoluteFilePath}`);
+      console.warn(`警告：未找到暂存文件: ${absoluteFilePath}`);
     return;
   }
 
@@ -80,7 +80,7 @@ stagedTsFiles.forEach(relativeFilePath => {
     content = content.replace(clientIdRegex, (match, prefix, quote, originalValue, suffix) => {
       const maskedValue = maskValue(originalValue);
       if (originalValue && originalValue !== maskedValue) {
-        console.error(`Masked clientId in ${relativeFilePath}`);
+          console.error(`已屏蔽${relativeFilePath}中的clientId`);
         modified = true;
         foundSecrets = true;
         return `${prefix}${quote}${maskedValue}${suffix}`;
@@ -91,7 +91,7 @@ stagedTsFiles.forEach(relativeFilePath => {
     content = content.replace(clientSecretRegex, (match, prefix, quote, originalValue, suffix) => {
       const maskedValue = maskValue(originalValue);
       if (originalValue && originalValue !== maskedValue) {
-        console.error(`Masked clientSecret in ${relativeFilePath}`);
+          console.error(`已屏蔽${relativeFilePath}中的clientSecret`);
         modified = true;
         foundSecrets = true;
         return `${prefix}${quote}${maskedValue}${suffix}`;
@@ -105,14 +105,14 @@ stagedTsFiles.forEach(relativeFilePath => {
       execSync(`git add "${absoluteFilePath}"`, { cwd: gitRoot });
     }
   } catch (error) {
-    console.error(`Error processing file ${relativeFilePath}:`, error);
+      console.error(`处理文件${relativeFilePath}时出错:`, error);
     // Decide if we should exit(1) here or allow commit to proceed
     // For now, log error and continue, but don't block commit for processing errors
   }
 });
 
 if (foundSecrets) {
-  console.log("clientId/clientSecret values masked and re-staged.");
+    console.log("clientId/clientSecret值已屏蔽并重新暂存。");
 }
 
 // Exit with 0 to allow the commit, mirroring the original script's behavior
