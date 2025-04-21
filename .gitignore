@@ -40,7 +40,6 @@ coverage/
 .DS_Store
 Thumbs.db
 *.tgz
-examples/
 node_modules
 demo.ts
 docs
