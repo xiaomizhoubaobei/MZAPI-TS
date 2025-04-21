@@ -2,7 +2,7 @@ name: build-and-publish
 
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
 
 jobs:
   build:
@@ -99,10 +99,10 @@ jobs:
 
             ## 📚 相关链接
             - [Pull Request #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})
-            - [文档](https://api.mizhoubaobei.top)
-            - [更新日志](https://github.com/xiaomizhoubaobei/MZAPI/CHANGELOG.md)
-            - [贡献指南](https://github.com/xuiaomizhoubaobei/MZAPI/CONTRIBUTING.md)
-            - [问题反馈](https://github.com/xiaomizhoubaobei/MZAPI/issues)
+            - [文档](https://help.mizhoubaobei.top)
+            - [更新日志](https://github.com/xiaomizhoubaobei/MZAPI-ts/CHANGELOG.md)
+            - [贡献指南](https://github.com/xiaomizhoubaobei/MZAPI-ts/CONTRIBUTING.md)
+            - [问题反馈](https://github.com/xiaomizhoubaobei/MZAPI-ts/issues)
 
             ## 🔒 安全性说明
             此次发布的软件包已通过 GitHub Actions 生成了项目证明（Artifact Attestation），并使用了 Sigstore 项目来确保软件的来源和完整性。
@@ -118,3 +118,21 @@ jobs:
           files: |
             build/
           token: ${{ secrets.TOKEN }}
+
+  publish-npm:
+    needs: create-github-release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - run: npm install
+      - run: npm run build
+      - name: Login to npm registry
+        run: npm login --registry=https://registry.npmjs.org/ --scope=@your-scope
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        run: npm publish
