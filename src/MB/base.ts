@@ -193,7 +193,7 @@ abstract class BaiduERNIEBase {
      * @protected
      */
     protected async getAccessToken(): Promise<string> {
-        const baiduAuth = new BaiduAuth(this.apiKey, this.secretKey);
+        const baiduAuth = BaiduAuth.getInstance(this.apiKey, this.secretKey);
         return await baiduAuth.getToken();
     }
 

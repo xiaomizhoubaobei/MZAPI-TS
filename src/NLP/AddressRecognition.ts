@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
 import {TosRequest} from "../utils/tosRequest";
 
@@ -23,9 +23,15 @@ interface AddressRecognitionResponse {
 export class AddressRecognition {
     private readonly apiUrl = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/address';
     private readonly auth: BaiduAuth;
+    private readonly clientId: string;
+    private readonly clientSecret: string;
+
 
     constructor(clientId: string, clientSecret: string) {
-        this.auth = new BaiduAuth(clientId, clientSecret);
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.auth = BaiduAuth.getInstance(this.clientId, this.clientSecret);
+        this.apiUrl = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/address';
     }
 
     /**
