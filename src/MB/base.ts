@@ -1,6 +1,5 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
-import {Log} from "./Log";
 import {TosRequest} from '../utils/tosRequest';
 
 /**
@@ -57,13 +56,29 @@ export interface APIResponse {
     id: string;
     object: string;
     created: number;
-    result: string;
+    sentence_id?: number;
+    is_end?: boolean;
     is_truncated: boolean;
+    finish_reason?: string;
+    search_info?: {
+        search_results: Array<{
+            index: number;
+            url: string;
+            title: string;
+        }>;
+    };
+    result: string;
     need_clear_history: boolean;
+    flag?: number;
+    ban_round?: number;
     usage: {
         prompt_tokens: number;
         completion_tokens: number;
         total_tokens: number;
+        prompt_tokens_details?: {
+            search_tokens: number;
+        };
+        search_count?: number;
     };
 }
 
@@ -82,21 +97,24 @@ abstract class BaiduERNIEBase {
     protected readonly apiKey: string;
     protected readonly secretKey: string;
     protected readonly apiUrl: string;
+    protected readonly modeName: string;
 
     /**
      * 创建BaiduERNIEBase实例
      * @param {string} apiKey - 百度API的客户端ID，用于身份验证
      * @param {string} secretKey - 百度API的客户端密钥，用于身份验证
      * @param {string} apiUrl - API端点URL
+     * @param {string} modelName - 模型名称
      * @throws {Error} 如果apiKey或secretKey为空或无效，将抛出错误
      */
-    protected constructor(apiKey: string, secretKey: string, apiUrl: string) {
+    protected constructor(apiKey: string, secretKey: string, apiUrl: string, modelName: string) {
         if (!apiKey || !secretKey || !apiUrl) {
             throw new Error('apiKey、secretKey和apiUrl都是必需的');
         }
         this.apiKey = apiKey;
         this.secretKey = secretKey;
         this.apiUrl = apiUrl;
+        this.modeName = modelName
     }
 
     /**
@@ -156,10 +174,12 @@ abstract class BaiduERNIEBase {
         };
 
         try {
-            const response = await axios(options);
-            Log.sendLog(response.data);
+            const response = await axios<APIResponse>(options);
             const tosRequest = new TosRequest();
-            await tosRequest.sendRequest(response.data);
+            await tosRequest.sendRequest({
+                ...response.data,
+                type: this.modeName
+            });
             return response.data;
         } catch (error) {
             throw new Error(`API请求失败: ${error instanceof Error ? error.message : String(error)}`);
@@ -173,7 +193,7 @@ abstract class BaiduERNIEBase {
      * @protected
      */
     protected async getAccessToken(): Promise<string> {
-        const baiduAuth = new BaiduAuth(this.apiKey, this.secretKey);
+        const baiduAuth = BaiduAuth.getInstance(this.apiKey, this.secretKey);
         return await baiduAuth.getToken();
     }
 
