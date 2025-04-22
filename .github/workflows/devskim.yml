@@ -1,0 +1,55 @@
+name: DevSkim
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  lint:
+    name: DevSkim
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run DevSkim scanner
+        uses: microsoft/DevSkim-Action@v1
+
+      - name: Upload DevSkim scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: devskim-results.sarif
+
+      - name: Comment PR with DevSkim results
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const results = fs.readFileSync('devskim-results.sarif', 'utf8');
+            const parsedResults = JSON.parse(results);
+            const issues = parsedResults.runs[0].results || [];
+            
+            if (issues.length > 0) {
+              const comment = `## DevSkim Security Scan Results\n\nFound ${issues.length} potential security issues:\n\n` + 
+                issues.map(issue => `- **${issue.level || 'warning'}**: ${issue.message.text}`).join('\n');
+            
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '## DevSkim Security Scan Results\n\nNo security issues found.'
+              });
+            }

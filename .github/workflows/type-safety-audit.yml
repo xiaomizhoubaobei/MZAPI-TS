@@ -2,7 +2,7 @@ name: Type Safety Audit
 
 on:
   pull_request:
-    types: [ closed ]
+    branches: [ "master" ]
 
 jobs:
   type-check:
@@ -69,7 +69,6 @@ jobs:
         with:
           name: consolidated-type-safety-report
           path: consolidated-type-safety-report.json
-    steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
