@@ -1,18 +1,17 @@
-# Dependency Review Action
+# 依赖审查 Action
 #
-# This Action will scan dependency manifest files that change as part of a Pull Request,
-# surfacing known-vulnerable versions of the packages declared or updated in the PR.
-# Once installed, if the workflow run is marked as required, PRs introducing known-vulnerable
-# packages will be blocked from merging.
+# 此Action会扫描Pull Request中变更的依赖清单文件，
+# 展示PR中声明或更新的已知有漏洞的软件包版本。
+# 一旦安装，如果工作流运行被标记为必需，则引入已知有漏洞软件包的PR将被阻止合并。
 #
-# Source repository: https://github.com/actions/dependency-review-action
-# Public documentation: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
-name: 'Dependency review'
+# 源代码仓库: https://github.com/actions/dependency-review-action
+# 公开文档: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
+name: '依赖审查'
 on:
   pull_request:
     branches: [ "master" ]
 
-# If using a dependency submission action in this workflow this permission will need to be set to:
+# 如果在此工作流中使用依赖提交action，则需要设置以下权限:
 #
 # permissions:
 #   contents: write
@@ -20,18 +19,18 @@ on:
 # https://docs.github.com/en/enterprise-cloud@latest/code-security/supply-chain-security/understanding-your-software-supply-chain/using-the-dependency-submission-api
 permissions:
   contents: read
-  # Write permissions for pull-requests are required for using the `comment-summary-in-pr` option
+  # 需要pull-requests的写权限来使用`comment-summary-in-pr`选项
   pull-requests: write
 
 jobs:
   dependency-review:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout repository'
+      - name: '检出仓库'
         uses: actions/checkout@v4
-      - name: 'Dependency Review'
+      - name: '依赖审查'
         uses: actions/dependency-review-action@v4
-        # Commonly enabled options, see https://github.com/actions/dependency-review-action#configuration-options for all available options.
+        # 常用启用选项，参见 https://github.com/actions/dependency-review-action#configuration-options 获取所有可用选项
         with:
           comment-summary-in-pr: always
           fail-on-severity: moderate

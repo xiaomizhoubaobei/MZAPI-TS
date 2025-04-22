@@ -1,0 +1,56 @@
+# 此工作流使用了未经GitHub认证的第三方Actions
+# 它们由第三方提供，受各自的服务条款、
+# 隐私政策和支持文档约束
+
+# 此工作流会检出代码，执行Codacy安全扫描
+# 并将结果与GitHub高级安全代码扫描功能集成
+# 有关Codacy安全扫描Action的使用和参数，请参考
+# `https://github.com/codacy/codacy-analysis-cli-action.`
+# 有关Codacy Analysis CLI的更多信息，请参考
+# `https://github.com/codacy/codacy-analysis-cli.`
+
+name: Codacy安全扫描
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  codacy-security-scan:
+    permissions:
+      contents: read # 用于actions/checkout检出代码
+      security-events: write # 用于github/codeql-action/upload-sarif上传SARIF结果
+      actions: read # 仅私有仓库需要，用于github/codeql-action/upload-sarif获取Action运行状态
+    name: Codacy安全扫描
+    runs-on: ubuntu-latest
+    steps:
+      # 将仓库检出到GitHub Actions运行器
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 执行Codacy Analysis CLI并生成包含安全问题的SARIF输出
+      - name: 运行Codacy Analysis CLI
+        uses: codacy/codacy-analysis-cli-action@d840f886c4bd4edc059706d09c6a1586111c540b
+        with:
+          # 访问`https://github.com/codacy/codacy-analysis-cli#project-token`获取Codacy仓库的项目令牌
+          # 也可以省略令牌，运行支持默认配置的工具
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          verbose: true
+          output: results.sarif
+          format: sarif
+          # 调整非安全问题的严重性
+          gh-code-scanning-compat: true
+          # 强制返回0退出码以允许生成SARIF文件
+          # 这将把PR拒绝控制权交给GitHub端
+          max-allowed-issues: 2147483647
+
+      # 上传上一步生成的SARIF文件
+      - name: 上传SARIF结果文件
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+          # 在PR中评论扫描结果
+          comment-on-pr: true

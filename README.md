@@ -1,5 +1,6 @@
 # MZAPI
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/cf4fa41d39a647f8b2ffede82703fcdd)](https://app.codacy.com/gh/xiaomizhoubaobei/MZAPI-TS/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 ## 项目概述
 

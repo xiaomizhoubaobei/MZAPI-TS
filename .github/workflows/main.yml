@@ -59,6 +59,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - run: npm install
+      - run: npm run build
       - name: Get version from package.json
         id: get_version
         run: echo ::set-output name=version::$(node -p "require('./package.json').version")
@@ -119,8 +121,30 @@ jobs:
             build/
           token: ${{ secrets.TOKEN }}
 
-  publish-npm:
+  publish-github:
     needs: create-github-release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+      - run: npm install
+      - run: npm run build
+      - name: Login to GitHub Packages
+        run: npm login --registry=https://npm.pkg.github.com --scope=@xiaomizhoubaobei
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.TOKEN }}
+      - name: Publish to GitHub Packages
+        run: npm publish
+
+  publish-npm:
+    needs: publish-github
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
