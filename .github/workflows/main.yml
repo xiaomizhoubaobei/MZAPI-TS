@@ -133,7 +133,7 @@ jobs:
           token: ${{ secrets.TOKEN }}
 
   publish-npm:
-    needs: publish-github
+    needs: create-github-release
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:

@@ -1,6 +1,7 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
 import {TosRequest} from "../utils/tosRequest";
+import {initSkyWalking} from "../utils/skywalking";
 
 interface AddressRecognitionResponse {
     log_id: number;
@@ -32,6 +33,7 @@ export class AddressRecognition {
         this.clientSecret = clientSecret;
         this.auth = BaiduAuth.getInstance(this.clientId, this.clientSecret);
         this.apiUrl = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/address';
+        initSkyWalking();
     }
 
     /**

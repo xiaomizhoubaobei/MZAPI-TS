@@ -1,6 +1,7 @@
 import BaiduAuth from '../utils/baiduauth';
 import {TosRequest} from "../utils/tosRequest";
 import axios, {AxiosRequestConfig} from 'axios';
+import {initSkyWalking} from "../utils/skywalking";
 
 export interface CommentTaggingResponse {
     log_id: number;
@@ -24,6 +25,7 @@ export class CommentTagging {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.auth = BaiduAuth.getInstance(this.clientId, this.clientSecret);
+        initSkyWalking();
     }
 
     /**
