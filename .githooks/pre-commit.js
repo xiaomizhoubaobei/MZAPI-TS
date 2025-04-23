@@ -74,6 +74,14 @@ stagedTsFiles.forEach(relativeFilePath => {
     let content = fs.readFileSync(absoluteFilePath, 'utf8');
     let modified = false;
 
+      // 检查并添加路径注释
+      const pathComment = "// 注意: 开发时引用的是SDK内部路径'../src'，实际使用时请修改为SDK包名'mzapi'\n";
+      if (!content.includes(pathComment)) {
+          content = pathComment + content;
+          modified = true;
+          console.log(`已在${relativeFilePath}开头添加路径注释`);
+      }
+
     const clientIdRegex = /(clientId\s*[:=]\s*)(["'])([^"']*)(["'])/g;
     const clientSecretRegex = /(clientSecret\s*[:=]\s*)(["'])([^"']*)(["'])/g;
 

@@ -1,6 +1,7 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
 import {TosRequest} from "../utils/tosRequest";
+import {initSkyWalking} from "../utils/skywalking";
 
 interface SentimentAnalysisResponse {
     /** 请求日志ID */
@@ -30,6 +31,7 @@ export class SentimentAnalysis {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.auth = BaiduAuth.getInstance(this.clientId, this.clientSecret);
+        initSkyWalking();
     }
 
     /**

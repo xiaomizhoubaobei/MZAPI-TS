@@ -1,6 +1,7 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import BaiduAuth from '../utils/baiduauth';
 import {TosRequest} from "../utils/tosRequest";
+import {initSkyWalking} from "../utils/skywalking";
 
 interface EmotionRecognitionResponse {
     /** 请求唯一标识码 */
@@ -37,6 +38,7 @@ export class EmotionRecognition {
         this.clientSecret = clientSecret;
         this.auth = BaiduAuth.getInstance(this.clientId, this.clientSecret);
         this.apiUrl = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/emotion';
+        initSkyWalking();
     }
 
     async recognize(text: string, scene: string = 'default'): Promise<EmotionRecognitionResponse> {
