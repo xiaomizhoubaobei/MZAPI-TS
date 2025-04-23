@@ -1,5 +1,5 @@
 // 注意: 开发时引用的是SDK内部路径'../src'，实际使用时请修改为SDK包名'mzapi'
-import { SentimentAnalysis } from '../../src/NLP/SentimentAnalysis';
+import { SentimentAnalysis } from '../src/NLP/SentimentAnalysis';
 
 // 替换为你的百度API客户端ID和密钥
 const clientId = '*****gG8eu';

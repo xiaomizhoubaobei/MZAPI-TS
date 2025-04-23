@@ -1,5 +1,5 @@
 // 注意: 开发时引用的是SDK内部路径'../src'，实际使用时请修改为SDK包名'mzapi'
-import {AddressRecognition} from '../../src';
+import {AddressRecognition} from '../src';
 
 
 async function addressRecognitionExample() {
