@@ -1,6 +1,6 @@
 {
   "name": "mzapi",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "MZAPI是一个基于typescript的SDK,旨在帮助开发者快速接入各种API服务。通过这个SDK,用户可以轻松地完成各种API调用。",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -20,6 +20,8 @@
     "@eslint/config-array": "^0.20.0",
     "@huaweicloud/huaweicloud-sdk-core": "^3.1.140",
     "@huaweicloud/huaweicloud-sdk-kms": "^3.1.128",
+    "@shikijs/langs": "^3.3.0",
+    "@shikijs/themes": "^3.3.0",
     "axios": "^1.8.4",
     "crypto-js": "^4.2.0",
     "docdash": "^2.0.2",

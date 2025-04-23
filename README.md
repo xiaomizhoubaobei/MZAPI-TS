@@ -24,7 +24,7 @@ npm install MZAPI
 
 ## 使用示例
 
-详细使用示例请见[示例代码](https://github.com/xiaomizhoubaobei/MZAPI/blob/master/JS/list.md)。
+详细使用示例请见[示例代码](./examples)。
 
 ## API文档
 

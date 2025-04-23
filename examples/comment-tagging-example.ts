@@ -1,5 +1,5 @@
 // 注意: 开发时引用的是SDK内部路径'../src'，实际使用时请修改为SDK包名'mzapi'
-import { CommentTagging } from '../../src/NLP/CommentTagging';
+import { CommentTagging } from '../src/NLP/CommentTagging';
 
 // 替换为你的百度API Key和Secret Key
 const CLIENT_ID = 'bsdK1sS6WitJpiSLqgrgG8eu';
