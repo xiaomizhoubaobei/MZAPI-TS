@@ -1,0 +1,48 @@
+name: Update Import Paths
+
+# 此工作流在向master分支提交PR时触发
+on:
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - 'examples/**'
+
+jobs:
+  update-imports:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v4
+
+      # 查找并替换示例中的导入路径
+      - name: Find and replace import paths
+        run: |
+          # 优化后的正则表达式，更精确匹配导入路径
+          find examples -name "*.ts" -type f -exec sed -i -E 's|from ["']\.\./src(["'])|from "mzapi\1|g; s|from ["']\.\./src/([^"']+)/([^"']+)["']|from "mzapi/\1/\2"|g' {} +
+      
+      # 验证替换结果
+      - name: Verify changes
+        run: |
+          if ! git diff --quiet examples; then
+            echo "::warning::Import path changes detected"
+          else
+            echo "No import path changes needed"
+            exit 0
+          fi
+
+      # 提交更改
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add examples
+          git diff --quiet && git diff --staged --quiet || git commit -m "更新示例中的导入路径"
+          git push
+      
+      # 错误处理
+      - name: Handle failure
+        if: failure()
+        run: |
+          echo "::error::Failed to update import paths"
+          exit 1

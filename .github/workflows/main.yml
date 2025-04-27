@@ -131,27 +131,3 @@ jobs:
           files: |
             build/
           token: ${{ secrets.TOKEN }}
-
-  publish-npm:
-    needs: create-github-release
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: build/
-      - name: Login to npm registry
-        run: npm login --registry=https://registry.npmjs.org/ --scope=@xiaomizhou111
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        if: always()
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
