@@ -8,10 +8,9 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "./build",
-    "rootDir": ".",
+    "rootDir": "./src",
     "rootDirs": [
-      "./src",
-      "./examples"
+      "./src"
     ],
     "strict": true,
     "esModuleInterop": true,
@@ -22,15 +21,15 @@
     "baseUrl": ".",
     "paths": {
       "*": [
-        "node_modules/*"
+        "node_modules/*",
+        "build/*"
       ]
     },
     "inlineSources": true,
     "sourceMap": true
   },
   "include": [
-    "./src/**/*",
-    "./examples/**/*"
+    "./src/**/*"
   ],
   "exclude": [
     "node_modules",
