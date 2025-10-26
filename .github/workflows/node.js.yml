@@ -1,0 +1,44 @@
+# 此工作流将执行 node 依赖的干净安装，缓存/恢复它们，构建源代码并在不同版本的 node 上运行测试
+# 更多信息请参见：https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+<<<<<<< HEAD
+=======
+permissions:
+  contents: read
+
+>>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        # 查看支持的 Node.js 发布计划：https://nodejs.org/en/about/releases/
+
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+    - name: Use Node.js ${{ matrix.node-version }}
+<<<<<<< HEAD
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+=======
+      uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+>>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm install -g yarn
+    - run: yarn install --frozen-lockfile
+    - run: yarn run build || true

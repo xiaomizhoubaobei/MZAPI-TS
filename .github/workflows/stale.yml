@@ -1,0 +1,38 @@
+# 此工作流会对长时间没有活动的issues和PRs发出警告，并在一定时间后关闭它们。
+#
+# 你可以通过修改此文件来调整行为。
+# 更多信息，请参阅：
+# https://github.com/actions/stale
+name: 标记不活跃的issues和pull requests
+
+on:
+  schedule:
+  - cron: '37 21 * * *'
+
+<<<<<<< HEAD
+=======
+permissions:
+  contents: read
+
+>>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+      with:
+        egress-policy: audit
+
+    - uses: actions/stale@f7176fd3007623b69d27091f9b9d4ab7995f0a06 # v5.2.1
+      with:
+        repo-token: ${{ secrets.TOKEN }}
+        stale-issue-message: '此Issue已长时间没有活动'
+        stale-pr-message: '此Pull Request已长时间没有活动'
+        stale-issue-label: '无issue活动'
+        stale-pr-label: '无pr活动'
