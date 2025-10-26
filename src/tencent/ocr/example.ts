@@ -3,8 +3,8 @@ import { GeneralBasicOCRRequest, GeneralBasicOCRResponse } from '../../type';
 
 // 初始化客户端
 const client = new GeneralBasicOCRClient({
-    secretId: 'AKID*******',
-    secretKey: 'MWTJ***kR6a',
+    secretId: '*******',
+    secretKey: '***',
 });
 
 // 打印OCR识别结果的详细信息
