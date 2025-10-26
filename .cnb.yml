@@ -1,0 +1,72 @@
+$:
+  vscode:
+    - runner:
+        cpus: 64
+      services:
+        - vscode
+        - docker
+      docker:
+        image: docker.cnb.cool/xmzzuzhi/cnb-docker/node:0.0.5
+      stages:
+        - name: 授予install_gpg_keys.sh权限
+          script:
+            - chmod +x /workspace/install_gpg_keys.sh
+        - name: 安装sudo更新APT源
+          script:
+            - apt-get update
+            - apt-get install -y sudo
+        - name: 安装pnpm
+          script:
+            - npm install -g pnpm
+        - name: 安装iflow
+          script:
+            - npm i -g @iflow-ai/iflow-cli@latest
+        - name: 安装Git LFS
+          script:
+            - sudo apt-get install -y git-lfs
+            - git lfs install
+        - name: 安装Github CLI
+          script:
+            - npm install -g @github/copilot
+        - name: 安装Claude Code
+          script:
+            - npm install -g @anthropic-ai/claude-code
+        - name: 安装OpenAI Code
+          script:
+            - npm install -g @openai/codex
+        - name: 安装Gemini
+          script:
+            - npm install -g @google/gemini-cli
+        - name: 安装Qwen Code
+          script:
+            - npm install -g @qwen-code/qwen-code
+        - name: 安装CloudBase CLI
+          script:
+            - npm i -g @cloudbase/cli
+main:
+  - push:
+      - docker:
+          image: node:22
+        stages:
+          # 1. 安装 pnpm
+          - name: 安装 pnpm
+            script: npm i -g pnpm
+
+          # 2. 安装依赖
+          - name: 安装依赖
+            script: pnpm install --frozen-lockfile
+
+          # 3. 构建 TypeScript
+          - name: 构建 TypeScript
+            script: pnpm run build
+
+          # 4. 发布到 CNB npm 制品库
+          - name: npm publish
+            image: tencentcom/npm
+            settings:
+              username:   $CNB_TOKEN_USER_NAME
+              token:      $CNB_TOKEN
+              email:      $CNB_COMMITTER_EMAIL
+              registry:   https://npm.cnb.cool/mizhoubaobei/ku/mzapi-ts/-/packages/
+              folder:     dist
+              fail_on_version_conflict: true
