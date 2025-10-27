@@ -28,7 +28,7 @@ jobs:
           egress-policy: audit
 
       - name: Mark stale issues and pull requests
-        uses: actions/stale@f7176fd3007623b69d27091f9b9d4ab7995f0a06 # v5.2.1
+        uses: actions/stale@5f858e3efba33a5ca4407a664cc011ad407f2008 # v10.1.0
         with:
           repo-token: ${{ secrets.TOKEN }}
           stale-issue-message: '此 Issue 已长时间没有活动'
