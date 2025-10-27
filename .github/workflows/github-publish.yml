@@ -16,6 +16,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -48,6 +49,6 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: npm install -g yarn
       - run: yarn install --frozen-lockfile
-      - run: yarn publish
+      - run: yarn publish -registry=https://npm.pkg.github.com/
         env:
           NODE_AUTH_TOKEN: ${{secrets.TOKEN}}

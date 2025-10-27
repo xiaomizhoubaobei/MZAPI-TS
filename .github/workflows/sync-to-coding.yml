@@ -1,14 +1,12 @@
-name: 同步代码到gitee和CNB
+# 同步代码到Gitee和CNB
+name: 同步代码到Gitee和CNB
+
 on:
   pull_request:
     branches:
       - main
     types: [closed]
 
-<<<<<<< HEAD
-jobs:
-  sync-to-gitee:
-=======
 permissions:
   contents: read
 
@@ -16,9 +14,8 @@ jobs:
   sync-to-gitee:
     permissions:
       contents: write  # for Git to git push
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    if: github.event.pull_request.merged == true
     env:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       GIT_USER: ${{ secrets.GITEE_USER }}
@@ -35,11 +32,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up SSH Agent
-<<<<<<< HEAD
-        uses: webfactory/ssh-agent@5f066a372ec13036ab7cb9a8adf18c936f8d2043 # v0.5.3
-=======
         uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
@@ -60,13 +53,10 @@ jobs:
         run: git push gitee main
 
   sync-to-cnb:
-<<<<<<< HEAD
-=======
     permissions:
       contents: write  # for Git to git push
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    if: github.event.pull_request.merged == true
     env:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       GIT_USER: ${{ secrets.CNB_USER }}
@@ -84,18 +74,14 @@ jobs:
           fetch-depth: 0
 
       - name: Set up SSH Agent
-<<<<<<< HEAD
-        uses: webfactory/ssh-agent@5f066a372ec13036ab7cb9a8adf18c936f8d2043 # v0.5.3
-=======
         uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Configure Git User
         run: |
-          git config --global user.name "${{ secrets.GIT_USER }}"
-          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.CNB_USER }}"
+          git config --global user.email "${{ secrets.CNB_EMAIL }}"
 
       - name: Add CNB Remote
         run: git remote add cnb https://${{ secrets.CNB_TOKEN }}@cnb.cool/XMZZUZHI/MZAPI/TypeScript

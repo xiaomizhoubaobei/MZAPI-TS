@@ -4,18 +4,14 @@ on:
   issues:
     types: [opened]
 
-<<<<<<< HEAD
-=======
 permissions:
   contents: read
 
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
 jobs:
   summary:
     runs-on: ubuntu-latest
     permissions:
       issues: write
-      models: read
       contents: read
 
     steps:
@@ -27,16 +23,16 @@ jobs:
       - name: 检出代码仓库
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
-      - name: 运行AI推理
+      - name: 运行 AI 推理
         id: inference
         uses: actions/ai-inference@b81b2afb8390ee6839b494a404766bef6493c7d9 # v1.2.8
         with:
           prompt: |
-            请用一段话总结以下GitHub issue:
+            请用一段话总结以下 GitHub issue:
             标题: ${{ github.event.issue.title }}
             内容: ${{ github.event.issue.body }}
 
-      - name: 以AI总结内容评论
+      - name: 以 AI 总结内容评论
         run: |
           gh issue comment $ISSUE_NUMBER --body '${{ steps.inference.outputs.response }}'
         env:

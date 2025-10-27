@@ -2,12 +2,9 @@ name: 欢迎问候
 
 on: [pull_request_target, issues]
 
-<<<<<<< HEAD
-=======
 permissions:
   contents: read
 
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
 jobs:
   greeting:
     runs-on: ubuntu-latest
@@ -15,13 +12,13 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-      with:
-        egress-policy: audit
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
 
-    - uses: actions/first-interaction@3c71ce730280171fd1cfb57c00c774f8998586f7 # v1
-      with:
-        repo-token: ${{ secrets.TOKEN }}
-        issue-message: "👋 感谢您提交首个Issue！我们非常重视您的反馈，团队将尽快审核并回复。"
-        pr-message: "🎉 感谢您提交首个Pull Request！我们感谢您的贡献，团队将尽快审核您的代码。"
+      - uses: actions/first-interaction@3c71ce730280171fd1cfb57c00c774f8998586f7 # v1
+        with:
+          repo-token: ${{ secrets.TOKEN }}
+          issue-message: "👋 感谢您提交首个Issue！我们非常重视您的反馈，团队将尽快审核并回复。"
+          pr-message: "🎉 感谢您提交首个Pull Request！我们感谢您的贡献，团队将尽快审核您的代码。"
