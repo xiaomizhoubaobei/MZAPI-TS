@@ -1,5 +1,6 @@
 # 腾讯云 TypeScript SDK
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f94cdd98e6e64cc6b93bdc00f0e057ce)](https://app.codacy.com/gh/xiaomizhoubaobei/MZAPI-TS?utm_source=github.com&utm_medium=referral&utm_content=xiaomizhoubaobei/MZAPI-TS&utm_campaign=Badge_Grade)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11338/badge)](https://www.bestpractices.dev/projects/11338)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/xiaomizhoubaobei/MZAPI-TS/badge)](https://scorecard.dev/viewer/?uri=github.com/xiaomizhoubaobei/MZAPI-TS)
 [![CodeQL](https://github.com/ossf/scorecard/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/xiaomizhoubaobei/MZAPI-TS/blob/main/.github/workflows/codeql.yml)
