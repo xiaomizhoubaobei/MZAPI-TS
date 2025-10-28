@@ -6,33 +6,29 @@
 name: 标记不活跃的issues和pull requests
 
 on:
-  schedule:
+ schedule:
   - cron: '37 21 * * *'
 
-<<<<<<< HEAD
-=======
 permissions:
-  contents: read
+ contents: read
 
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
 jobs:
-  stale:
+ stale:
+  runs-on: ubuntu-latest
+  permissions:
+   issues: write
+   pull-requests: write
 
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
+  steps:
+   - name: Harden the runner (Audit all outbound calls)
+     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     with:
+      egress-policy: audit
 
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-      with:
-        egress-policy: audit
-
-    - uses: actions/stale@f7176fd3007623b69d27091f9b9d4ab7995f0a06 # v5.2.1
-      with:
-        repo-token: ${{ secrets.TOKEN }}
-        stale-issue-message: '此Issue已长时间没有活动'
-        stale-pr-message: '此Pull Request已长时间没有活动'
-        stale-issue-label: '无issue活动'
-        stale-pr-label: '无pr活动'
+   - uses: actions/stale@5f858e3efba33a5ca4407a664cc011ad407f2008 # v10.1.0
+     with:
+      repo-token: ${{ secrets.TOKEN }}
+      stale-issue-message: '此Issue已长时间没有活动'
+      stale-pr-message: '此Pull Request已长时间没有活动'
+      stale-issue-label: '无issue活动'
+      stale-pr-label: '无pr活动'

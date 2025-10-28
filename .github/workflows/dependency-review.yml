@@ -1,27 +1,27 @@
-# Dependency Review Action
+# 依赖审查操作
 #
-# This Action will scan dependency manifest files that change as part of a Pull Request,
-# surfacing known-vulnerable versions of the packages declared or updated in the PR.
-# Once installed, if the workflow run is marked as required,
-# PRs introducing known-vulnerable packages will be blocked from merging.
+# 此操作将扫描作为拉取请求一部分而更改的依赖清单文件，
+# 显示 PR 中声明或更新的包的已知易受攻击的版本。
+# 安装后，如果工作流运行被标记为必需，
+# 则引入已知易受攻击包的 PR 将被阻止合并。
 #
-# Source repository: https://github.com/actions/dependency-review-action
+# 源代码仓库: https://github.com/actions/dependency-review-action
 name: 'Dependency Review'
 on: [pull_request]
 
 permissions:
-  contents: read
+ contents: read
 
 jobs:
-  dependency-review:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-        with:
-          egress-policy: audit
+ dependency-review:
+  runs-on: ubuntu-latest
+  steps:
+   - name: Harden the runner (Audit all outbound calls)
+     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     with:
+      egress-policy: audit
 
-      - name: 'Checkout Repository'
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@45529485b5eb76184ced07362d2331fd9d26f03f # v4
+   - name: 'Checkout Repository'
+     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+   - name: 'Dependency Review'
+     uses: actions/dependency-review-action@45529485b5eb76184ced07362d2331fd9d26f03f # v4

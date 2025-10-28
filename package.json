@@ -1,46 +1,61 @@
 {
-  "name": "mzapi-ts-sdk",
-  "version": "0.0.1",
-  "description": "一个TypeScript SDK,支持多种云服务的统一接口",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist/**/*"
-  ],
-  "type": "commonjs",
-  "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://cnb.cool/XMZZUZHI/MZAPI/TypeScript.git"
-  },
-  "keywords": [
-    "tencent",
-    "cloud",
-    "sdk",
-    "api",
-    "typescript",
-    "ocr",
-    "tencentcloud"
-  ],
-  "author": "祁潇潇",
-  "license": "AGPL-3.0-only",
-  "devDependencies": {
-    "@types/axios": "^0.9.36",
-    "@types/node": "^24.9.1",
-    "@types/uuid": "^10.0.0",
-    "husky": "^9.1.7",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "axios": "^1.12.2"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  }
+ "name": "mzapi-ts-sdk",
+ "version": "0.0.1",
+ "description": "一个TypeScript SDK,支持多种云服务的统一接口",
+ "main": "dist/index.js",
+ "module": "dist/index.js",
+ "types": "dist/index.d.ts",
+ "files": [
+  "dist/**/*"
+ ],
+ "type": "commonjs",
+ "scripts": {
+  "build": "tsc",
+  "prepublishOnly": "npm run build",
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "lint": "eslint src/**/*.ts",
+  "lint:fix": "eslint src/**/*.ts --fix",
+  "format": "prettier --write src/**/*.ts",
+  "format:check": "prettier --check src/**/*.ts",
+  "lint:prettier": "prettier --check src/**/*.ts"
+ },
+ "repository": {
+  "type": "git",
+  "url": "https://cnb.cool/XMZZUZHI/MZAPI/TypeScript.git"
+ },
+ "keywords": [
+  "tencent",
+  "cloud",
+  "sdk",
+  "api",
+  "typescript",
+  "ocr",
+  "tencentcloud"
+ ],
+ "author": "祁潇潇",
+ "license": "AGPL-3.0-or-later",
+ "devDependencies": {
+  "@babel/generator": "^7.28.5",
+  "@babel/parser": "^7.28.5",
+  "@babel/traverse": "^7.28.5",
+  "@types/node": "^24.9.1",
+  "@types/uuid": "^11.0.0",
+  "@types/winston": "^2.4.4",
+  "@typescript-eslint/eslint-plugin": "^6.7.4",
+  "@typescript-eslint/parser": "^6.7.4",
+  "eslint": "^8.51.0",
+  "eslint-config-prettier": "^9.0.0",
+  "eslint-plugin-import": "^2.28.1",
+  "eslint-plugin-prettier": "^5.0.0",
+  "prettier": "^3.0.3",
+  "typescript": "~5.3.0"
+ },
+ "dependencies": {
+  "@babel/types": "^7.28.5",
+  "axios": "^1.13.0",
+  "winston": "^3.18.3"
+ },
+ "engines": {
+  "node": ">=14.0.0"
+ }
 }

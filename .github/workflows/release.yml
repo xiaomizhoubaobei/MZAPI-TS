@@ -1,0 +1,178 @@
+name: Create Release with GPG Signature
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+    paths:
+      - 'src/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.event.sender.type != 'Bot'
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@v2.13.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@v4.3.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6.0.0
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build project
+        run: yarn run build
+
+      - name: Install GPG
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # 获取当前版本号
+          CURRENT_VERSION=${{ steps.get_version.outputs.version }}
+          # 获取上一个版本号，并处理tag不足两个的情况
+          if [ $(git tag | wc -l) -lt 2 ]; then
+            echo "Fewer than two tags found, generating changelog from the beginning of history."
+            PREVIOUS_VERSION=$(git rev-list --max-parents=0 HEAD)
+          else
+            PREVIOUS_VERSION=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=2 | tail -n 1))
+          fi
+          # 获取当前版本和上一个版本之间的提交日志
+          LOG=$(git log --pretty=format:"%s" ${PREVIOUS_VERSION}..${CURRENT_VERSION})
+          # 初始化分类变更日志
+          FEATURES=""
+          FIXES=""
+          CHORES=""
+          # 处理每条提交信息
+          while IFS= read -r line; do
+            if [[ $line =~ ^feat: ]]; then
+              FEATURES+="- ${line#feat: }\n"
+            elif [[ $line =~ ^fix: ]]; then
+              FIXES+="- ${line#fix: }\n"
+            elif [[ $line =~ ^chore: ]]; then
+              CHORES+="- ${line#chore: }\n"
+            fi
+          done <<< "$LOG"
+          # 生成最终的变更日志
+          RELEASE_NOTES=""
+          if [ -n "$FEATURES" ]; then
+            RELEASE_NOTES+="### 新特性\n$FEATURES\n"
+          fi
+          if [ -n "$FIXES" ]; then
+            RELEASE_NOTES+="### 修复\n$FIXES\n"
+          fi
+          if [ -n "$CHORES" ]; then
+            RELEASE_NOTES+="### 其他\n$CHORES\n"
+          fi
+          # 输出日志
+          echo "release_notes=$RELEASE_NOTES" >> $GITHUB_OUTPUT
+
+      - name: Create release archive
+        run: |
+          # 使用从 package.json 获取的版本号
+          VERSION=${{ steps.get_version.outputs.version }}
+          # 创建发布包
+          tar -czf mzapi-ts-sdk-${VERSION}.tar.gz --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='dist' .
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          name: 发布 ${{ github.ref }}
+          body: |
+            ## 此版本的变更
+
+            ${{ steps.release_notes.outputs.release_notes }}
+
+            ## GPG 签名验证
+            所有发布资产均使用 GPG 签名。要验证签名：
+            1. 下载 .asc 签名文件以及对应的发布资产
+            2. 运行命令: `gpg --verify <签名文件> <资产文件>`
+
+            签名应与指纹为以下值的公钥匹配: ${{ secrets.GPG_FINGERPRINT || '未提供' }}
+          draft: false
+          prerelease: false
+          files: |
+            mzapi-ts-sdk-${{ steps.get_version.outputs.version }}.tar.gz
+            mzapi-ts-sdk-${{ steps.get_version.outputs.version }}.tar.gz.asc
+
+      - name: Sign release assets
+        run: |
+          # 使用从 package.json 获取的版本号
+          VERSION=${{ steps.get_version.outputs.version }}
+          # 为发布资产创建GPG签名
+          gpg --armor --detach-sign mzapi-ts-sdk-${VERSION}.tar.gz
+          
+          # 上传签名文件
+          gh release upload ${VERSION} mzapi-ts-sdk-${VERSION}.tar.gz.asc
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+      - name: Attest build provenance
+        id: attest
+        uses: actions/attest-build-provenance@v3.0.0
+        with:
+          # 配置 attest-build-provenance 动作的参数
+          # 指定构建证明文件的名称和路径
+          # 指定要生成构建证明的文件
+          subject-path: mzapi-ts-sdk-${{ steps.get_version.outputs.version }}.tar.gz
+          # 上传构建证明文件到 GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+      - name: Update GitHub Release with attestation details
+        run: |
+          # 读取构建证明文件中的详细信息
+          ATTESTATION_URL=$(jq -r '.attestation_url' build-provenance.json)
+          BUNDLE_PATH=$(jq -r '.bundle_path' build-provenance.json)
+          # 更新 Release 描述
+          gh release edit ${GITHUB_REF} --body "
+          ## 此版本的变更
+
+          ${{ steps.release_notes.outputs.release_notes }}
+
+          ## GPG 签名验证
+          所有发布资产均使用 GPG 签名。要验证签名：
+          1. 下载 .asc 签名文件以及对应的发布资产
+          2. 运行命令: `gpg --verify <签名文件> <资产文件>`
+
+          签名应与指纹为以下值的公钥匹配: ${{ secrets.GPG_FINGERPRINT || '未提供' }}
+
+          ## 构建证明
+          - **证明 URL**: $ATTESTATION_URL
+          - **证明文件路径**: $BUNDLE_PATH
+          "
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}

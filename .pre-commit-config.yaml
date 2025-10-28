@@ -1,18 +1,43 @@
 repos:
-- repo: https://github.com/gitleaks/gitleaks
-  rev: v8.16.3
-  hooks:
-  - id: gitleaks
-- repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 3.0.0
-  hooks:
-  - id: shellcheck
-- repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v8.38.0
-  hooks:
-  - id: eslint
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
-  hooks:
-  - id: end-of-file-fixer
-  - id: trailing-whitespace
+ - repo: https://github.com/gitleaks/gitleaks
+   rev: v8.16.3
+   hooks:
+    - id: gitleaks
+ - repo: https://github.com/jumanjihouse/pre-commit-hooks
+   rev: 3.0.0
+   hooks:
+    - id: shellcheck
+ - repo: https://github.com/pre-commit/mirrors-eslint
+   rev: v8.38.0
+   hooks:
+    - id: eslint
+      types_or: [file, text]
+      files: \.(js|ts)$
+      args: [--fix, --ext, .js, .ts]
+ - repo: https://github.com/pre-commit/pre-commit-hooks
+   rev: v4.4.0
+   hooks:
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+ - repo: https://github.com/pre-commit/mirrors-prettier
+   rev: v3.0.0
+   hooks:
+    - id: prettier
+      types_or: [javascript, jsx, ts, tsx, json, yaml, markdown]
+ - repo: local
+   hooks:
+    - id: tsc
+      name: tsc
+      entry: tsc
+      language: system
+      types_or: [file, text]
+      files: \.ts$
+      args: [--noEmit, --skipLibCheck]
+      pass_filenames: false
+    - id: obfuscate-keys
+      name: obfuscate-keys
+      entry: node scripts/obfuscate-keys.js
+      language: system
+      types_or: [file, text]
+      files: \.(js|ts)$
+      pass_filenames: false
