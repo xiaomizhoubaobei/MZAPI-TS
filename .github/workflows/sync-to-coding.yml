@@ -1,104 +1,125 @@
 name: 同步代码到gitee和CNB
 on:
-  pull_request:
-    branches:
-      - main
-    types: [closed]
+ pull_request:
+  branches:
+   - main
+  types: [closed]
 
-<<<<<<< HEAD
-jobs:
-  sync-to-gitee:
-=======
 permissions:
-  contents: read
+ contents: read
 
 jobs:
-  sync-to-gitee:
-    permissions:
-      contents: write  # for Git to git push
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
-    env:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      GIT_USER: ${{ secrets.GITEE_USER }}
-      GIT_EMAIL: ${{ secrets.GITEE_EMAIL }}
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-        with:
-          egress-policy: audit
+ sync-to-gitee:
+  permissions:
+   contents: write # for Git to git push
+  runs-on: ubuntu-latest
+  if: github.event.pull_request.merged == true
+  env:
+   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+   GIT_USER: ${{ secrets.GITEE_USER }}
+   GIT_EMAIL: ${{ secrets.GITEE_EMAIL }}
+  steps:
+   - name: Harden the runner (Audit all outbound calls)
+     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     with:
+      egress-policy: audit
 
-      - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-        with:
-          fetch-depth: 0
+   - name: Checkout
+     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+     with:
+      fetch-depth: 0
 
-      - name: Set up SSH Agent
-<<<<<<< HEAD
-        uses: webfactory/ssh-agent@5f066a372ec13036ab7cb9a8adf18c936f8d2043 # v0.5.3
-=======
-        uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+   - name: Set up SSH Agent
+     uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+     with:
+      ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Accept Gitee Host Key
-        run: |
-          echo -e "Host gitee.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-          ssh-keyscan gitee.com >> ~/.ssh/known_hosts
+   - name: Accept Gitee Host Key
+     run: |
+      echo -e "Host gitee.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+      ssh-keyscan gitee.com >> ~/.ssh/known_hosts
 
-      - name: Configure Git User
-        run: |
-          git config --global user.name "${{ secrets.GITEE_USER }}"
-          git config --global user.email "${{ secrets.GITEE_EMAIL }}"
+   - name: Configure Git User
+     run: |
+      git config --global user.name "${{ secrets.GITEE_USER }}"
+      git config --global user.email "${{ secrets.GITEE_EMAIL }}"
 
-      - name: Add Gitee Remote
-        run: git remote add gitee git@gitee.com:qinjielove/mzapi-ts.git
+   - name: Add Gitee Remote
+     run: git remote add gitee git@gitee.com:qinjielove/mzapi-ts.git
 
-      - name: Push to Gitee
-        run: git push gitee main
+   - name: Push to Gitee
+     run: git push gitee main
 
-  sync-to-cnb:
-<<<<<<< HEAD
-=======
-    permissions:
-      contents: write  # for Git to git push
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
-    env:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      GIT_USER: ${{ secrets.CNB_USER }}
-      GIT_EMAIL: ${{ secrets.CNB_EMAIL }}
-      CNB_TOKEN: ${{ secrets.CNB_TOKEN }}
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-        with:
-          egress-policy: audit
+ sync-to-cnb:
+   permissions:
+     contents: write # for Git to git push
+   runs-on: ubuntu-latest
+   if: github.event.pull_request.merged == true || github.event_name == 'push'
+   env:
+     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+     GIT_USER: ${{ secrets.CNB_USER }}
+     GIT_EMAIL: ${{ secrets.CNB_EMAIL }}
+     CNB_TOKEN: ${{ secrets.CNB_TOKEN }}
+   steps:
+     - name: Harden the runner (Audit all outbound calls)
+       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+       with:
+         egress-policy: audit
 
-      - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-        with:
-          fetch-depth: 0
+     - name: Checkout
+       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+       with:
+         fetch-depth: 0
 
-      - name: Set up SSH Agent
-<<<<<<< HEAD
-        uses: webfactory/ssh-agent@5f066a372ec13036ab7cb9a8adf18c936f8d2043 # v0.5.3
-=======
-        uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+     - name: Set up SSH Agent
+       uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+       with:
+         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Configure Git User
-        run: |
-          git config --global user.name "${{ secrets.GIT_USER }}"
-          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+     - name: Configure Git User
+       run: |
+         git config --global user.name "${{ secrets.CNB_USER }}"
+         git config --global user.email "${{ secrets.CNB_EMAIL }}"
 
-      - name: Add CNB Remote
-        run: git remote add cnb https://${{ secrets.CNB_TOKEN }}@cnb.cool/XMZZUZHI/MZAPI/TypeScript
+     - name: Add CNB Remote
+       run: git remote add cnb https://${{ secrets.CNB_TOKEN }}@cnb.cool/XMZZUZHI/MZAPI/TypeScript
 
-      - name: Push to CNB
-        run: git push cnb main
+     - name: Push to CNB
+       run: git push cnb main
+
+ sync-to-atomgit:
+   permissions:
+     contents: write # for Git to git push
+   runs-on: ubuntu-latest
+   if: github.event.pull_request.merged == true || github.event_name == 'push'
+   env:
+     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+     GIT_USER: ${{ secrets.ATOMGITNAME }}
+     GIT_EMAIL: ${{ secrets.CNB_EMAIL }}
+     CNB_TOKEN: ${{ secrets.ATOMGITTOKEN }}
+   steps:
+     - name: Harden the runner (Audit all outbound calls)
+       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+       with:
+         egress-policy: audit
+
+     - name: Checkout
+       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+       with:
+         fetch-depth: 0
+
+     - name: Set up SSH Agent
+       uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+       with:
+         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+     - name: Configure Git User
+       run: |
+         git config --global user.name "${{ secrets.ATOMGITNAME }}"
+         git config --global user.email "${{ secrets.CNB_EMAIL }}"
+
+     - name: Add ATOMGIT Remote
+       run: git remote add cnb https://${{ATOMGITNAME}}:${{ secrets.ATOMGIITTOKEN }}@atomgit.com/qixiaoxin1/mzapi-ts.git
+
+     - name: Push to CNB
+       run: git push ATOMGIT main

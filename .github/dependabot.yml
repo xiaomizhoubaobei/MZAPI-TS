@@ -1,11 +1,23 @@
+# 要开始使用Dependabot进行版本更新，你需要指定要更新的包生态系统以及包清单文件的位置。
+# 请查看文档以了解所有配置选项：
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
 version: 2
 updates:
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: daily
+ - package-ecosystem: 'github-actions'
+   directory: '/'
+   schedule:
+    interval: 'monthly'
+   groups:
+    github-actions:
+     patterns:
+      - '*'
 
-  - package-ecosystem: npm
-    directory: /
-    schedule:
-      interval: daily
+ - package-ecosystem: 'npm'
+   directory: '/'
+   schedule:
+    interval: 'monthly'
+   groups:
+    npm-dependencies:
+     patterns:
+      - '*'

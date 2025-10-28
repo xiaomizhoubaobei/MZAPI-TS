@@ -1,53 +1,53 @@
 # 此工作流将使用 Node.js 运行测试，并在发布时发布包到 GitHub Packages
 # 更多信息请参考：https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 
-
 name: Publish to Github
 
 on:
-  pull_request:
-    branches:
-      - main
-    types: [closed]
+ pull_request:
+  branches:
+   - main
+  types: [closed]
 
 permissions:
-  contents: read
+ contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-        with:
-          egress-policy: audit
+ build:
+  runs-on: ubuntu-latest
+  if: github.event.pull_request.merged == true
+  steps:
+   - name: Harden the runner (Audit all outbound calls)
+     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     with:
+      egress-policy: audit
 
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
-        with:
-          node-version: 20
-      - run: npm install -g yarn
-      - run: yarn install --frozen-lockfile
+   - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+   - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+     with:
+      node-version: 20
+   - run: npm install -g yarn
+   - run: yarn install --frozen-lockfile
 
-  publish-gpr:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-        with:
-          egress-policy: audit
+ publish-gpr:
+  needs: build
+  runs-on: ubuntu-latest
+  permissions:
+   contents: read
+   packages: write
+  steps:
+   - name: Harden the runner (Audit all outbound calls)
+     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     with:
+      egress-policy: audit
 
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
-        with:
-          node-version: 20
-          registry-url: https://npm.pkg.github.com/
-      - run: npm install -g yarn
-      - run: yarn install --frozen-lockfile
-      - run: yarn publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.TOKEN}}
+   - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+   - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+     with:
+      node-version: 20
+      registry-url: https://npm.pkg.github.com/
+   - run: npm install -g yarn
+   - run: yarn install --frozen-lockfile
+   - run: yarn publish -registry=https://npm.pkg.github.com/
+     env:
+      NODE_AUTH_TOKEN: ${{secrets.TOKEN}}

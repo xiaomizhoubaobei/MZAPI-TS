@@ -1,45 +1,41 @@
 name: 自动总结新issues
 
 on:
-  issues:
-    types: [opened]
+ issues:
+  types: [opened]
 
-<<<<<<< HEAD
-=======
 permissions:
-  contents: read
+ contents: read
 
->>>>>>> 3d8bb81330e38fd3e8fc58921e65f8df929224e7
 jobs:
-  summary:
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      models: read
-      contents: read
+ summary:
+  runs-on: ubuntu-latest
+  permissions:
+   issues: write
+   contents: read
 
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-        with:
-          egress-policy: audit
+  steps:
+   - name: Harden the runner (Audit all outbound calls)
+     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     with:
+      egress-policy: audit
 
-      - name: 检出代码仓库
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+   - name: 检出代码仓库
+     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: 运行AI推理
-        id: inference
-        uses: actions/ai-inference@b81b2afb8390ee6839b494a404766bef6493c7d9 # v1.2.8
-        with:
-          prompt: |
-            请用一段话总结以下GitHub issue:
-            标题: ${{ github.event.issue.title }}
-            内容: ${{ github.event.issue.body }}
+   - name: 运行AI推理
+     id: inference
+     uses: actions/ai-inference@a1c11829223a786afe3b5663db904a3aa1eac3a2 # v2.0.1
+     with:
+      prompt: |
+       请用一段话总结以下GitHub issue:
+       标题: ${{ github.event.issue.title }}
+       内容: ${{ github.event.issue.body }}
 
-      - name: 以AI总结内容评论
-        run: |
-          gh issue comment $ISSUE_NUMBER --body '${{ steps.inference.outputs.response }}'
-        env:
-          GH_TOKEN: ${{ secrets.TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          RESPONSE: ${{ steps.inference.outputs.response }}
+   - name: 以AI总结内容评论
+     run: |
+      gh issue comment $ISSUE_NUMBER --body '${{ steps.inference.outputs.response }}'
+     env:
+      GH_TOKEN: ${{ secrets.TOKEN }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      RESPONSE: ${{ steps.inference.outputs.response }}
