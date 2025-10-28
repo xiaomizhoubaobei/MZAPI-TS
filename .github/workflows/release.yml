@@ -22,7 +22,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout code
-        uses: actions/checkout@v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
 
@@ -70,7 +70,35 @@ jobs:
             PREVIOUS_VERSION=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=2 | tail -n 1))
           fi
           # 获取当前版本和上一个版本之间的提交日志
-          LOG=$(git log --pretty=format:"%s" ${PREVIOUS_VERSION}..${CURRENT_VERSION})
+          # 使用 -- 来分隔修订版本和文件路径，避免歧义
+          LOG=$(git log --pretty=format:"%s" ${PREVIOUS_VERSION}..${CURRENT_VERSION} --)
+          # 初始化分类变更日志
+          FEATURES=""
+          FIXES=""
+          CHORES=""
+          # 处理每条提交信息
+          while IFS= read -r line; do
+            if [[ $line =~ ^feat: ]]; then
+              FEATURES+="- ${line#feat: }\n"
+            elif [[ $line =~ ^fix: ]]; then
+              FIXES+="- ${line#fix: }\n"
+            elif [[ $line =~ ^chore: ]]; then
+              CHORES+="- ${line#chore: }\n"
+            fi
+          done <<< "$LOG"
+          # 生成最终的变更日志
+          RELEASE_NOTES=""
+          if [ -n "$FEATURES" ]; then
+            RELEASE_NOTES+="### 新特性\n$FEATURES\n"
+          fi
+          if [ -n "$FIXES" ]; then
+            RELEASE_NOTES+="### 修复\n$FIXES\n"
+          fi
+          if [ -n "$CHORES" ]; then
+            RELEASE_NOTES+="### 其他\n$CHORES\n"
+          fi
+          # 输出日志
+          echo "release_notes=$RELEASE_NOTES" >> $GITHUB_OUTPUT
           # 初始化分类变更日志
           FEATURES=""
           FIXES=""

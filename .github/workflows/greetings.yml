@@ -19,10 +19,10 @@ jobs:
 
    - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d # v3.1.0
      with:
-       token: ${{ secrets.TOKEN }}      # 或者直接用 ${{ github.token }}
-       issue-message: |
+       repo_token: ${{ secrets.GITHUB_TOKEN }}
+       issue_message: |
          👋 感谢您提交首个 Issue！
          我们非常重视您的反馈，团队将尽快审核并回复。
-       pr-message: |
+       pr_message: |
          🎉 感谢您提交首个 Pull Request！
          我们感谢您的贡献，团队将尽快审核您的代码。
