@@ -8,6 +8,8 @@ on:
     branches:
       - main
     types: [closed]
+    paths:
+      - 'src/**'
 
 permissions:
   contents: read
