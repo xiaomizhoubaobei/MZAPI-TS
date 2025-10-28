@@ -13,6 +13,7 @@ permissions:
 jobs:
  build:
   runs-on: ubuntu-latest
+  if: github.event.pull_request.merged == true && github.event.sender.type != 'Bot'
 
   strategy:
    matrix:

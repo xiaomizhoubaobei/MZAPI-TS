@@ -1,12 +1,25 @@
-import { GeneralBasicOCRClient } from './GeneralBasicOCR';
+import { GeneralBasicOCRClient, OCRError } from './GeneralBasicOCR';
 import { GeneralBasicOCRRequest, GeneralBasicOCRResponse } from '../../type';
 import winston from 'winston';
 import https from 'https';
 
 const { combine, timestamp, printf } = winston.format;
 
+
+// 注意：在实际使用时，应该填入您的真实secretId
+const  secretId = '************************************';
+// 注意：在实际使用时，应该填入您的真实secretKey
+const  secretKey = '********************************';
 // 创建自定义日志格式
 const logFormat = printf(({ level, message, timestamp }) => {
+    return `${timestamp} [${level.toUpperCase()}]: ${message}`;
+});
+
+// 创建审计日志格式
+const auditFormat = printf(({ level, message, timestamp, userId, action, result }) => {
+    if (level === 'audit') {
+        return `${timestamp} [AUDIT]: User=${userId}, Action=${action}, Result=${result}, Message=${message}`;
+    }
     return `${timestamp} [${level.toUpperCase()}]: ${message}`;
 });
 
@@ -22,14 +35,30 @@ const logger = winston.createLogger({
     ]
 });
 
+// 创建专门用于审计的日志记录器
+const auditLogger = winston.createLogger({
+    level: 'audit',
+    format: combine(
+        timestamp(),
+        auditFormat
+    ),
+    transports: [
+        new winston.transports.Console()
+    ]
+});
+
 // 初始化客户端
 const client = new GeneralBasicOCRClient({
-    // 注意：在实际使用时，应该填入您的真实secretId
-// 注意：在实际使用时，应该填入您的真实secretId
-secretId: '************************************',
-    // 注意：在实际使用时，应该填入您的真实secretKey
-// 注意：在实际使用时，应该填入您的真实secretKey
-secretKey: '********************************',
+  secretId, secretKey,
+});
+
+// 记录客户端初始化的审计日志
+auditLogger.log({
+    level: 'audit',
+    userId: secretId,
+    action: 'INIT_CLIENT',
+    result: 'SUCCESS',
+    message: 'OCR client initialized'
 });
 
 // 打印OCR识别结果的详细信息
@@ -68,8 +97,44 @@ function printOCRResult(response: GeneralBasicOCRResponse, isPdf: boolean = fals
     });
 }
 
+// 安全地记录错误信息，不泄露敏感系统信息
+function logSecureError(error: OCRError | Error, context: string) {
+    if (error instanceof OCRError) {
+        // 仅记录错误代码和一般性错误信息
+        logger.error(`[${context}] OCR处理失败 - 错误代码: ${error.code}, 信息: ${error.message}`);
+        
+        // 仅在调试模式下记录详细信息，且不包含敏感字段
+        if (process.env.NODE_ENV === 'development') {
+            logger.debug(`[${context}] 错误详情: ${JSON.stringify({
+                code: error.code,
+                message: error.message,
+                // 不包含可能的敏感信息如堆栈跟踪
+                hasDetails: !!error.details
+            })}`);
+        }
+    } else {
+        // 处理非OCRError类型的错误
+        logger.error(`[${context}] 处理失败 - 信息: ${error.message || '未知错误'}`);
+        
+        // 仅在开发环境下记录额外信息
+        if (process.env.NODE_ENV === 'development') {
+            logger.debug(`[${context}] 非OCRError错误: ${typeof error}`);
+        }
+    }
+}
+
 // 示例1: 使用图片URL进行OCR识别
 async function exampleWithUrl() {
+    
+    // 记录OCR调用开始的审计日志
+    auditLogger.log({
+        level: 'audit',
+        userId: secretId,
+        action: 'OCR_URL_REQUEST',
+        result: 'START',
+        message: 'Starting OCR recognition with URL'
+    });
+    
     try {
         const request: GeneralBasicOCRRequest = {
             ImageUrl: 'https://ocr-demo-1254418846.cos.ap-guangzhou.myqcloud.com/general/GeneralBasicOCR/GeneralBasicOCR1.jpg', // 替换为实际的图片URL
@@ -77,16 +142,49 @@ async function exampleWithUrl() {
         };
 
         const response = await client.GeneralBasicOCR(request);
+        
+        // 记录OCR调用成功的审计日志
+        auditLogger.log({
+            level: 'audit',
+            userId: secretId,
+            action: 'OCR_URL_REQUEST',
+            result: 'SUCCESS',
+            message: `OCR recognition completed successfully with ${response.TextDetections.length} text detections`
+        });
+        
         logger.info('OCR识别结果:');
-        logger.debug(`完整响应数据: ${JSON.stringify(response, null, 2)}`);
+        // 仅在开发环境下记录完整响应数据，避免在生产环境中泄露敏感信息
+        if (process.env.NODE_ENV === 'development') {
+            logger.debug(`完整响应数据: ${JSON.stringify(response, null, 2)}`);
+        }
         printOCRResult(response);
     } catch (error) {
-        logger.error(`OCR识别失败: ${error}`);
+        // 记录OCR调用失败的审计日志
+        auditLogger.log({
+            level: 'audit',
+            userId: secretId,
+            action: 'OCR_URL_REQUEST',
+            result: 'FAILURE',
+            message: `OCR recognition failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        });
+        
+        // 使用安全的错误日志记录
+        logSecureError(error as OCRError | Error, 'exampleWithUrl');
     }
 }
 
 // 示例2: 使用Base64编码图片进行OCR识别
-async function exampleWithBase64() {
+async function exampleWithBase64(){
+    
+    // 记录OCR调用开始的审计日志
+    auditLogger.log({
+        level: 'audit',
+        userId: secretId,
+        action: 'OCR_BASE64_REQUEST',
+        result: 'START',
+        message: 'Starting OCR recognition with Base64 image'
+    });
+    
     try {
         // 使用指定的图片URL
         const imageUrl = 'https://ocr-demo-1254418846.cos.ap-guangzhou.myqcloud.com/general/GeneralBasicOCR/GeneralBasicOCR1.jpg';
@@ -110,19 +208,74 @@ async function exampleWithBase64() {
         };
 
         const response = await client.GeneralBasicOCR(request);
+        
+        // 记录OCR调用成功的审计日志
+        auditLogger.log({
+            level: 'audit',
+            userId: secretId,
+            action: 'OCR_BASE64_REQUEST',
+            result: 'SUCCESS',
+            message: `OCR recognition completed successfully with ${response.TextDetections.length} text detections`
+        });
+        
         logger.info('OCR识别结果 (Base64):');
-        logger.debug(`完整响应数据: ${JSON.stringify(response, null, 2)}`);
+        // 仅在开发环境下记录完整响应数据，避免在生产环境中泄露敏感信息
+        if (process.env.NODE_ENV === 'development') {
+            logger.debug(`完整响应数据: ${JSON.stringify(response, null, 2)}`);
+        }
         printOCRResult(response);
     } catch (error) {
-        logger.error(`OCR识别失败: ${error}`);
+        // 记录OCR调用失败的审计日志
+        auditLogger.log({
+            level: 'audit',
+            userId: secretId,
+            action: 'OCR_BASE64_REQUEST',
+            result: 'FAILURE',
+            message: `OCR recognition failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        });
+        
+        // 使用安全的错误日志记录
+        logSecureError(error as OCRError | Error, 'exampleWithBase64');
     }
 }
 
 // 运行示例
 async function runExamples() {
+
+    // 记录示例运行开始的审计日志
+    auditLogger.log({
+        level: 'audit',
+        userId: secretId,
+        action: 'RUN_EXAMPLES',
+        result: 'START',
+        message: 'Starting OCR examples execution'
+    });
+    
     await exampleWithUrl();
     // 运行Base64示例
     await exampleWithBase64();
+    
+    // 记录示例运行完成的审计日志
+    auditLogger.log({
+        level: 'audit',
+        userId: secretId,
+        action: 'RUN_EXAMPLES',
+        result: 'SUCCESS',
+        message: 'OCR examples execution completed'
+    });
 }
 
-runExamples().catch((error) => logger.error(`运行示例时出错: ${error}`));
+runExamples().catch((error) => {
+    
+    // 记录示例运行失败的审计日志
+    auditLogger.log({
+        level: 'audit',
+        userId: secretId,
+        action: 'RUN_EXAMPLES',
+        result: 'FAILURE',
+        message: `Error during examples execution: ${error instanceof Error ? error.message : 'Unknown error'}`
+    });
+    
+    // 使用安全的错误日志记录
+    logSecureError(error as OCRError | Error, 'runExamples');
+});

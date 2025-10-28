@@ -14,7 +14,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && github.event.sender.type != 'Bot'
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@v2.13.1
@@ -62,8 +62,13 @@ jobs:
         run: |
           # 获取当前版本号
           CURRENT_VERSION=${{ steps.get_version.outputs.version }}
-          # 获取上一个版本号
-          PREVIOUS_VERSION=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=2 | tail -n 1))
+          # 获取上一个版本号，并处理tag不足两个的情况
+          if [ $(git tag | wc -l) -lt 2 ]; then
+            echo "Fewer than two tags found, generating changelog from the beginning of history."
+            PREVIOUS_VERSION=$(git rev-list --max-parents=0 HEAD)
+          else
+            PREVIOUS_VERSION=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=2 | tail -n 1))
+          fi
           # 获取当前版本和上一个版本之间的提交日志
           LOG=$(git log --pretty=format:"%s" ${PREVIOUS_VERSION}..${CURRENT_VERSION})
           # 初始化分类变更日志

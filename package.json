@@ -35,6 +35,9 @@
  "author": "祁潇潇",
  "license": "AGPL-3.0-or-later",
  "devDependencies": {
+  "@babel/generator": "^7.28.5",
+  "@babel/parser": "^7.28.5",
+  "@babel/traverse": "^7.28.5",
   "@types/node": "^24.9.1",
   "@types/uuid": "^11.0.0",
   "@types/winston": "^2.4.4",
@@ -48,6 +51,7 @@
   "typescript": "~5.3.0"
  },
  "dependencies": {
+  "@babel/types": "^7.28.5",
   "axios": "^1.13.0",
   "winston": "^3.18.3"
  },
