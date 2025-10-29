@@ -1,0 +1,8 @@
+{
+  "SecretId": "AKIDEXAMPLE2",
+  "SecretKey": "EXAMPLESECRET2",
+  "Region": "ap-shanghai",
+  "Version": "2020-01-01",
+  "Timeout": 60,
+  "RetryTimes": 5
+}

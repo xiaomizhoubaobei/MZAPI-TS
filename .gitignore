@@ -97,3 +97,15 @@ typings/
 .idea/
 *.swp
 *.swo
+
+# Fuzzing 相关
+fuzzing/dist/
+fuzzing/*.log
+fuzzing/*.out
+fuzzing/*.cov
+fuzzing/crash-*
+fuzzing/hang-*
+fuzzing/tmp-*
+
+# 但不忽略 corpus 目录中的种子文件                                                                                                                  │
+!fuzzing/corpus/
