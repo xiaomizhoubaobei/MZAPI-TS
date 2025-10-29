@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release:
@@ -22,26 +23,57 @@ jobs:
           egress-policy: audit
 
       - name: Checkout code
-        uses: actions/checkout@v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
 
+      - name: Audit - Workflow started
+        run: |
+          echo "Release workflow started for PR #${{ github.event.pull_request.number }}" >> audit.log
+          echo "Triggered by: ${{ github.event.pull_request.user.login }}" >> audit.log
+          echo "Commit SHA: ${{ github.sha }}" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
+
       - name: Set up Node.js
-        uses: actions/setup-node@v6.0.0
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Audit - Node.js setup completed
+        run: |
+          echo "Node.js setup completed" >> audit.log
+          echo "Node version: $(node --version)" >> audit.log
+          echo "NPM version: $(npm --version)" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Audit - Dependencies installed
+        run: |
+          echo "Dependencies installed" >> audit.log
+          echo "Yarn version: $(yarn --version)" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
+
       - name: Build project
         run: yarn run build
+
+      - name: Audit - Project built
+        run: |
+          echo "Project built successfully" >> audit.log
+          echo "Build timestamp: $(date -u)" >> audit.log
 
       - name: Install GPG
         run: |
           sudo apt-get update
           sudo apt-get install -y gnupg
+
+      - name: Audit - GPG installed
+        run: |
+          echo "GPG installed" >> audit.log
+          echo "GPG version: $(gpg --version | head -n 1)" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
@@ -51,53 +83,90 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
 
+      - name: Audit - GPG key imported
+        run: |
+          echo "GPG key imported" >> audit.log
+          echo "Key fingerprint: ${{ secrets.GPG_FINGERPRINT || 'Not available' }}" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
+
       - name: Get version from package.json
         id: get_version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Generate release notes
-        id: release_notes
+      - name: Audit - Version retrieved
         run: |
-          # 获取当前版本号
-          CURRENT_VERSION=${{ steps.get_version.outputs.version }}
-          # 获取上一个版本号，并处理tag不足两个的情况
-          if [ $(git tag | wc -l) -lt 2 ]; then
-            echo "Fewer than two tags found, generating changelog from the beginning of history."
-            PREVIOUS_VERSION=$(git rev-list --max-parents=0 HEAD)
-          else
-            PREVIOUS_VERSION=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=2 | tail -n 1))
-          fi
-          # 获取当前版本和上一个版本之间的提交日志
-          LOG=$(git log --pretty=format:"%s" ${PREVIOUS_VERSION}..${CURRENT_VERSION})
-          # 初始化分类变更日志
-          FEATURES=""
-          FIXES=""
-          CHORES=""
-          # 处理每条提交信息
-          while IFS= read -r line; do
-            if [[ $line =~ ^feat: ]]; then
-              FEATURES+="- ${line#feat: }\n"
-            elif [[ $line =~ ^fix: ]]; then
-              FIXES+="- ${line#fix: }\n"
-            elif [[ $line =~ ^chore: ]]; then
-              CHORES+="- ${line#chore: }\n"
-            fi
-          done <<< "$LOG"
-          # 生成最终的变更日志
-          RELEASE_NOTES=""
-          if [ -n "$FEATURES" ]; then
-            RELEASE_NOTES+="### 新特性\n$FEATURES\n"
-          fi
-          if [ -n "$FIXES" ]; then
-            RELEASE_NOTES+="### 修复\n$FIXES\n"
-          fi
-          if [ -n "$CHORES" ]; then
-            RELEASE_NOTES+="### 其他\n$CHORES\n"
-          fi
-          # 输出日志
-          echo "release_notes=$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "Version retrieved from package.json" >> audit.log
+          echo "Package version: ${{ steps.get_version.outputs.version }}" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
+
+      - name: Generate release notes
+        uses: actions/github-script@v7
+        id: release_notes
+        with:
+          script: |
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            
+            const previousRelease = releases.length > 0 ? releases[0] : null;
+            let changelog = "### 本次发布包含以下变更\n\n";
+            
+            if (previousRelease) {
+              const { data: commits } = await github.rest.repos.compareCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: previousRelease.tag_name,
+                head: context.sha
+              });
+              
+              const features = [];
+              const fixes = [];
+              const chores = [];
+              
+              for (const commit of commits.commits) {
+                const message = commit.commit.message;
+                if (message.startsWith('feat:')) {
+                  features.push(message.substring(5).trim());
+                } else if (message.startsWith('fix:')) {
+                  fixes.push(message.substring(4).trim());
+                } else if (message.startsWith('chore:')) {
+                  chores.push(message.substring(6).trim());
+                }
+              }
+              
+              if (features.length > 0) {
+                changelog += "### 新特性\n";
+                features.forEach(f => changelog += `- ${f}\n`);
+                changelog += "\n";
+              }
+              
+              if (fixes.length > 0) {
+                changelog += "### 修复\n";
+                fixes.forEach(f => changelog += `- ${f}\n`);
+                changelog += "\n";
+              }
+              
+              if (chores.length > 0) {
+                changelog += "### 其他\n";
+                chores.forEach(c => changelog += `- ${c}\n`);
+                changelog += "\n";
+              }
+              
+              if (features.length === 0 && fixes.length === 0 && chores.length === 0) {
+                changelog += "没有找到符合格式的提交记录\n";
+              }
+            } else {
+              changelog += "这是首次发布\n";
+            }
+            
+            core.setOutput('release_notes', changelog);
+      - name: Audit - Release notes generated
+        run: |
+          echo "Release notes generated using GitHub API" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
 
       - name: Create release archive
         run: |
@@ -105,6 +174,11 @@ jobs:
           VERSION=${{ steps.get_version.outputs.version }}
           # 创建发布包
           tar -czf mzapi-ts-sdk-${VERSION}.tar.gz --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='dist' .
+          
+          # 审计日志 - 记录发布包创建
+          echo "Release archive created" >> audit.log
+          echo "Archive name: mzapi-ts-sdk-${VERSION}.tar.gz" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
 
       - name: Create GitHub Release
         id: create_release
@@ -137,8 +211,13 @@ jobs:
           
           # 上传签名文件
           gh release upload ${VERSION} mzapi-ts-sdk-${VERSION}.tar.gz.asc
+          
+          # 审计日志 - 记录资产签名和上传
+          echo "Release assets signed and uploaded" >> audit.log
+          echo "Signed asset: mzapi-ts-sdk-${VERSION}.tar.gz.asc" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Attest build provenance
         id: attest
@@ -150,7 +229,13 @@ jobs:
           subject-path: mzapi-ts-sdk-${{ steps.get_version.outputs.version }}.tar.gz
           # 上传构建证明文件到 GitHub Release
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Audit - Build provenance attested
+        run: |
+          echo "Build provenance attested" >> audit.log
+          echo "Subject path: mzapi-ts-sdk-${{ steps.get_version.outputs.version }}.tar.gz" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
 
       - name: Update GitHub Release with attestation details
         run: |
@@ -166,7 +251,7 @@ jobs:
           ## GPG 签名验证
           所有发布资产均使用 GPG 签名。要验证签名：
           1. 下载 .asc 签名文件以及对应的发布资产
-          2. 运行命令: `gpg --verify <签名文件> <资产文件>`
+          2. 运行命令: \`gpg --verify <签名文件> <资产文件>\`
 
           签名应与指纹为以下值的公钥匹配: ${{ secrets.GPG_FINGERPRINT || '未提供' }}
 
@@ -174,5 +259,18 @@ jobs:
           - **证明 URL**: $ATTESTATION_URL
           - **证明文件路径**: $BUNDLE_PATH
           "
+          
+          # 审计日志 - 记录Release更新
+          echo "GitHub Release updated with attestation details" >> audit.log
+          echo "Attestation URL: $ATTESTATION_URL" >> audit.log
+          echo "Bundle path: $BUNDLE_PATH" >> audit.log
+          echo "Timestamp: $(date -u)" >> audit.log
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload audit log
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-audit-log
+          path: audit.log
+          retention-days: 30

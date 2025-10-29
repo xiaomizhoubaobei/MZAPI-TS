@@ -9,7 +9,6 @@ on:
       - 'src/**'
 
 permissions:
- id-token: write
  contents: read
 
 jobs:
@@ -22,25 +21,79 @@ jobs:
      with:
       egress-policy: audit
 
-   - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+   - name: Audit - Workflow started
+     run: |
+       echo "NPM Publish workflow started for PR #${{ github.event.pull_request.number }}" >> audit.log
+       echo "Triggered by: ${{ github.event.pull_request.user.login }}" >> audit.log
+       echo "Commit SHA: ${{ github.sha }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
+   - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+   - name: Audit - Code checked out
+     run: |
+       echo "Code checked out" >> audit.log
+       echo "Repository: ${{ github.repository }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
      with:
       node-version: '20'
       registry-url: 'https://registry.npmjs.org'
+   - name: Audit - Node.js setup completed
+     run: |
+       echo "Node.js setup completed" >> audit.log
+       echo "Node version: $(node --version)" >> audit.log
+       echo "NPM version: $(npm --version)" >> audit.log
+       echo "Registry URL: https://registry.npmjs.org" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    # Ensure npm 11.5.1 or later is installed
    - name: Update npm
      run: npm install -g npm@latest
+   - name: Audit - NPM updated
+     run: |
+       echo "NPM updated" >> audit.log
+       echo "New NPM version: $(npm --version)" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Install Yarn
      run: npm install -g yarn
+   - name: Audit - Yarn installed
+     run: |
+       echo "Yarn installed" >> audit.log
+       echo "Yarn version: $(yarn --version)" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Install dependencies
      run: yarn install --frozen-lockfile
+   - name: Audit - Dependencies installed
+     run: |
+       echo "Dependencies installed with frozen lockfile" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Build project if script exists
      run: yarn run build || true
+   - name: Audit - Build completed
+     run: |
+       echo "Build process completed" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Publish package
-     run: yarn publish
+     run: |
+       if ! yarn publish; then
+         echo "Error: Failed to publish package to NPM" >> audit.log
+         echo "Timestamp: $(date -u)" >> audit.log
+         exit 1
+       fi
+   - name: Audit - Package published
+     run: |
+       echo "Package published to NPM" >> audit.log
+       echo "Package version: $(node -p "require('./package.json').version")" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
+   - name: Upload audit log
+     uses: actions/upload-artifact@v4
+     with:
+       name: npm-publish-audit-log
+       path: audit.log
+       retention-days: 30

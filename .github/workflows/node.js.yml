@@ -30,16 +30,70 @@ jobs:
      with:
       egress-policy: audit
 
+   - name: Audit - Workflow started
+     run: |
+       echo "Node.js CI workflow started for PR #${{ github.event.pull_request.number }}" >> audit.log
+       echo "Triggered by: ${{ github.event.pull_request.user.login }}" >> audit.log
+       echo "Commit SHA: ${{ github.sha }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+   - name: Audit - Code checked out
+     run: |
+       echo "Code checked out" >> audit.log
+       echo "Repository: ${{ github.repository }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Use Node.js ${{ matrix.node-version }}
      uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
      with:
       node-version: ${{ matrix.node-version }}
       cache: 'npm'
+   - name: Audit - Node.js setup completed
+     run: |
+       echo "Node.js setup completed" >> audit.log
+       echo "Node version: ${{ matrix.node-version }}" >> audit.log
+       echo "Cache: npm" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - run: npm install -g yarn
+   - name: Audit - Yarn installed
+     run: |
+       echo "Yarn installed globally" >> audit.log
+       echo "Yarn version: $(yarn --version)" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
-   - run: yarn install --frozen-lockfile
+   - name: Install dependencies
+     run: |
+       if ! yarn install --frozen-lockfile; then
+         echo "Error: Failed to install dependencies" >> audit.log
+         echo "Node version: ${{ matrix.node-version }}" >> audit.log
+         echo "Timestamp: $(date -u)" >> audit.log
+         exit 1
+       fi
+   - name: Audit - Dependencies installed
+     run: |
+       echo "Dependencies installed with frozen lockfile" >> audit.log
+       echo "Node version: ${{ matrix.node-version }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
-   - run: yarn run build || true
+   - name: Build project
+     run: |
+       if ! yarn run build; then
+         echo "Warning: Build failed for Node.js ${{ matrix.node-version }}" >> audit.log
+         echo "Build output may be incomplete" >> audit.log
+         echo "Timestamp: $(date -u)" >> audit.log
+         # Continue with the workflow even if build fails
+       fi
+   - name: Audit - Build completed
+     run: |
+       echo "Build process completed" >> audit.log
+       echo "Node version: ${{ matrix.node-version }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
+   - name: Upload audit log
+     uses: actions/upload-artifact@v4
+     with:
+       name: nodejs-ci-audit-log
+       path: audit.log
+       retention-days: 30
