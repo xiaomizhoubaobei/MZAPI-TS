@@ -68,7 +68,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Upload audit log
-     uses: actions/upload-artifact@v4
+     uses: actions/upload-artifact@v5
      with:
        name: summarize-issues-audit-log
        path: audit.log

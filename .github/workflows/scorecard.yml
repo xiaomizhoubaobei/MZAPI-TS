@@ -94,7 +94,7 @@ jobs:
    # 将结果上传到 GitHub 的代码扫描仪表板（可选）。
    # 注释掉将禁用将结果上传到您的仓库的代码扫描仪表板
    - name: 'Upload to code-scanning'
-     uses: github/codeql-action/upload-sarif@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
+     uses: github/codeql-action/upload-sarif@0499de31b99561a6d14a36a5f662c2a54f91beee # v4.31.2
      with:
       sarif_file: results.sarif
    - name: Audit - Results uploaded to code scanning
@@ -104,7 +104,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Upload audit log
-     uses: actions/upload-artifact@v4
+     uses: actions/upload-artifact@v5
      with:
        name: scorecard-audit-log
        path: audit.log

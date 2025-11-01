@@ -73,7 +73,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Initialize CodeQL
-     uses: github/codeql-action/init@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
+     uses: github/codeql-action/init@0499de31b99561a6d14a36a5f662c2a54f91beee # v4.31.2
      with:
       languages: ${{ matrix.language }}
    - name: Audit - CodeQL initialized
@@ -83,7 +83,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Perform CodeQL Analysis
-     uses: github/codeql-action/analyze@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
+     uses: github/codeql-action/analyze@0499de31b99561a6d14a36a5f662c2a54f91beee # v4.31.2
      with:
       category: '/language:${{matrix.language}}'
    - name: Audit - CodeQL analysis completed
@@ -94,7 +94,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Upload audit log
-     uses: actions/upload-artifact@v4
+     uses: actions/upload-artifact@v5
      with:
        name: codeql-audit-log
        path: audit.log
