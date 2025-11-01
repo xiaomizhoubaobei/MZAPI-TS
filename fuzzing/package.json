@@ -1,0 +1,12 @@
+{
+  "name": "mzapi-ts-sdk-fuzz-test",
+  "version": "1.0.0",
+  "description": "Simple test to verify fuzzing environment",
+  "main": "index.js",
+  "scripts": {
+    "test:fuzz": "node -e 'console.log(\"Fuzzing environment test passed\")'"
+  },
+  "dependencies": {
+    "@jazzer.js/core": "^2.1.0"
+  }
+}

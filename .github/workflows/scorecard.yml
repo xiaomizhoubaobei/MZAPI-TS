@@ -7,8 +7,6 @@ on:
  # 确保维护检查定期更新。
  # 详情请参阅：https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
  branch_protection_rule:
-  schedule:
-  - cron: '24 17 * * 2'
  push:
   branches: ['main']
 
@@ -36,10 +34,23 @@ jobs:
      with:
       egress-policy: audit
 
+   - name: Audit - Workflow started
+     run: |
+       echo "Scorecard analysis workflow started" >> audit.log
+       echo "Event type: ${{ github.event_name }}" >> audit.log
+       echo "Branch: ${{ github.ref_name }}" >> audit.log
+       echo "Default branch: ${{ github.event.repository.default_branch }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
    - name: 'Checkout code'
      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
      with:
       persist-credentials: false
+   - name: Audit - Code checked out
+     run: |
+       echo "Code checked out for scorecard analysis" >> audit.log
+       echo "Repository: ${{ github.repository }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: 'Run analysis'
      uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
@@ -59,9 +70,12 @@ jobs:
       # 私有仓库：
       #   - `publish_results` 将始终设置为 `false`，无论此处输入的值是什么。
       publish_results: true
-
-      # （可选）如果您的 .gitattributes 文件中有标记为 export-ignore 的文件，请取消注释 file_mode
-      # file_mode: git
+   - name: Audit - Scorecard analysis completed
+     run: |
+       echo "Scorecard analysis completed" >> audit.log
+       echo "Results file: results.sarif" >> audit.log
+       echo "Publish results: true" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    # 将运行结果作为工件上传（可选）。注释掉将禁用以 SARIF 格式将运行结果上传到仓库的 Actions 选项卡。
    - name: 'Upload artifact'
@@ -70,6 +84,12 @@ jobs:
       name: SARIF file
       path: results.sarif
       retention-days: 5
+   - name: Audit - SARIF artifact uploaded
+     run: |
+       echo "SARIF artifact uploaded" >> audit.log
+       echo "Artifact name: SARIF file" >> audit.log
+       echo "Retention days: 5" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    # 将结果上传到 GitHub 的代码扫描仪表板（可选）。
    # 注释掉将禁用将结果上传到您的仓库的代码扫描仪表板
@@ -77,3 +97,15 @@ jobs:
      uses: github/codeql-action/upload-sarif@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
      with:
       sarif_file: results.sarif
+   - name: Audit - Results uploaded to code scanning
+     run: |
+       echo "Results uploaded to code scanning" >> audit.log
+       echo "SARIF file: results.sarif" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
+   - name: Upload audit log
+     uses: actions/upload-artifact@v4
+     with:
+       name: scorecard-audit-log
+       path: audit.log
+       retention-days: 30

@@ -1,0 +1,9 @@
+{
+  "ImageBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+  "ImageUrl": "https://example.com/test.jpg",
+  "Scene": "normal",
+  "LanguageType": "zh",
+  "IsPdf": false,
+  "PdfPageNumber": 1,
+  "IsWords": false
+}

@@ -32,24 +32,70 @@ jobs:
      with:
       egress-policy: audit
 
+   - name: Audit - Workflow started
+     run: |
+       echo "CodeQL Analysis workflow started" >> audit.log
+       echo "Event type: ${{ github.event_name }}" >> audit.log
+       if [ "${{ github.event_name }}" = "pull_request" ]; then
+         echo "PR number: ${{ github.event.pull_request.number }}" >> audit.log
+         echo "Triggered by: ${{ github.event.pull_request.user.login }}" >> audit.log
+       fi
+       echo "Commit SHA: ${{ github.sha }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
    - name: Checkout repository
      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+   - name: Audit - Code checked out
+     run: |
+       echo "Code checked out for CodeQL analysis" >> audit.log
+       echo "Repository: ${{ github.repository }}" >> audit.log
+       echo "OS: ${{ matrix.os }}" >> audit.log
+       echo "Language: ${{ matrix.language }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Setup Node.js
      uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
      with:
       node-version: ${{ matrix.node-version }}
+   - name: Audit - Node.js setup completed
+     run: |
+       echo "Node.js setup completed" >> audit.log
+       echo "Node version: ${{ matrix.node-version }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Install dependencies
      run: |
       yarn install
+   - name: Audit - Dependencies installed
+     run: |
+       echo "Dependencies installed" >> audit.log
+       echo "Yarn version: $(yarn --version)" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Initialize CodeQL
      uses: github/codeql-action/init@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
      with:
       languages: ${{ matrix.language }}
+   - name: Audit - CodeQL initialized
+     run: |
+       echo "CodeQL initialized" >> audit.log
+       echo "Language: ${{ matrix.language }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Perform CodeQL Analysis
      uses: github/codeql-action/analyze@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
      with:
       category: '/language:${{matrix.language}}'
+   - name: Audit - CodeQL analysis completed
+     run: |
+       echo "CodeQL analysis completed" >> audit.log
+       echo "Language: ${{ matrix.language }}" >> audit.log
+       echo "OS: ${{ matrix.os }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
+   - name: Upload audit log
+     uses: actions/upload-artifact@v4
+     with:
+       name: codeql-audit-log
+       path: audit.log
+       retention-days: 30

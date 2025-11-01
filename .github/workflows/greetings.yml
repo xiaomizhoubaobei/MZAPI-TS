@@ -17,6 +17,19 @@ jobs:
      with:
       egress-policy: audit
 
+   - name: Audit - Workflow started
+     run: |
+       echo "Greetings workflow started" >> audit.log
+       echo "Event type: ${{ github.event_name }}" >> audit.log
+       if [ "${{ github.event_name }}" = "issues" ]; then
+         echo "Issue number: ${{ github.event.issue.number }}" >> audit.log
+         echo "Issue author: ${{ github.event.issue.user.login }}" >> audit.log
+       elif [ "${{ github.event_name }}" = "pull_request_target" ]; then
+         echo "PR number: ${{ github.event.pull_request.number }}" >> audit.log
+         echo "PR author: ${{ github.event.pull_request.user.login }}" >> audit.log
+       fi
+       echo "Timestamp: $(date -u)" >> audit.log
+
    - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d # v3.1.0
      with:
        repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -26,3 +39,15 @@ jobs:
        pr_message: |
          🎉 感谢您提交首个 Pull Request！
          我们感谢您的贡献，团队将尽快审核您的代码。
+   - name: Audit - First interaction completed
+     run: |
+       echo "First interaction completed" >> audit.log
+       echo "Event type: ${{ github.event_name }}" >> audit.log
+       echo "Timestamp: $(date -u)" >> audit.log
+
+   - name: Upload audit log
+     uses: actions/upload-artifact@v4
+     with:
+       name: greetings-audit-log
+       path: audit.log
+       retention-days: 30
