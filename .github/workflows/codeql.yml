@@ -28,7 +28,7 @@ jobs:
 
   steps:
    - name: Harden the runner (Audit all outbound calls)
-     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
      with:
       egress-policy: audit
 
@@ -44,7 +44,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Checkout repository
-     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+     uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
    - name: Audit - Code checked out
      run: |
        echo "Code checked out for CodeQL analysis" >> audit.log
@@ -54,7 +54,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Setup Node.js
-     uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+     uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
      with:
       node-version: ${{ matrix.node-version }}
    - name: Audit - Node.js setup completed
@@ -73,7 +73,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Initialize CodeQL
-     uses: github/codeql-action/init@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
+     uses: github/codeql-action/init@5d4e8d1aca955e8d8589aabd499c5cae939e33c7 # v4.31.9
      with:
       languages: ${{ matrix.language }}
    - name: Audit - CodeQL initialized
@@ -83,7 +83,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Perform CodeQL Analysis
-     uses: github/codeql-action/analyze@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
+     uses: github/codeql-action/analyze@5d4e8d1aca955e8d8589aabd499c5cae939e33c7 # v4.31.9
      with:
       category: '/language:${{matrix.language}}'
    - name: Audit - CodeQL analysis completed
@@ -94,7 +94,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Upload audit log
-     uses: actions/upload-artifact@v4
+     uses: actions/upload-artifact@v6
      with:
        name: codeql-audit-log
        path: audit.log
