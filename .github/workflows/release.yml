@@ -18,7 +18,7 @@ jobs:
     if: github.event.pull_request.merged == true && github.event.sender.type != 'Bot'
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@v2.13.1
+        uses: step-security/harden-runner@v2.14.2
         with:
           egress-policy: audit
 
