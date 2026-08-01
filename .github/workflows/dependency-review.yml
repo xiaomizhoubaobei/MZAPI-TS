@@ -17,7 +17,7 @@ jobs:
   runs-on: ubuntu-latest
   steps:
    - name: Harden the runner (Audit all outbound calls)
-     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
      with:
       egress-policy: audit
 
@@ -29,7 +29,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: 'Checkout Repository'
-     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+     uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
    - name: Audit - Code checked out
      run: |
        echo "Code checked out for dependency review" >> audit.log
@@ -37,14 +37,14 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: 'Dependency Review'
-     uses: actions/dependency-review-action@45529485b5eb76184ced07362d2331fd9d26f03f # v4
+     uses: actions/dependency-review-action@1e966ba708e4b64bb0c9bfb7abb5a232840be16a # v4
    - name: Audit - Dependency review completed
      run: |
        echo "Dependency review completed" >> audit.log
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Upload audit log
-     uses: actions/upload-artifact@v4
+     uses: actions/upload-artifact@v7
      with:
        name: dependency-review-audit-log
        path: audit.log

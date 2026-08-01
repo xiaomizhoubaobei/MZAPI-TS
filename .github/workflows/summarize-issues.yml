@@ -16,7 +16,7 @@ jobs:
 
   steps:
    - name: Harden the runner (Audit all outbound calls)
-     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
      with:
       egress-policy: audit
 
@@ -30,7 +30,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: 检出代码仓库
-     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+     uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
    - name: Audit - Code checked out
      run: |
        echo "Code checked out for issue summary" >> audit.log
@@ -39,7 +39,7 @@ jobs:
 
    - name: 运行AI推理
      id: inference
-     uses: actions/ai-inference@a1c11829223a786afe3b5663db904a3aa1eac3a2 # v2.0.1
+     uses: actions/ai-inference@a7805884c80886efc241e94a5351df715968a0ad # v2.1.1
      with:
       prompt: |
        请用一段话总结以下GitHub issue:
@@ -68,7 +68,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Upload audit log
-     uses: actions/upload-artifact@v4
+     uses: actions/upload-artifact@v7
      with:
        name: summarize-issues-audit-log
        path: audit.log

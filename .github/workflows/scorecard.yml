@@ -30,7 +30,7 @@ jobs:
 
   steps:
    - name: Harden the runner (Audit all outbound calls)
-     uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+     uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
      with:
       egress-policy: audit
 
@@ -43,7 +43,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: 'Checkout code'
-     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+     uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
      with:
       persist-credentials: false
    - name: Audit - Code checked out
@@ -53,7 +53,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: 'Run analysis'
-     uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
+     uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
      with:
       results_file: results.sarif
       results_format: sarif
@@ -79,7 +79,7 @@ jobs:
 
    # 将运行结果作为工件上传（可选）。注释掉将禁用以 SARIF 格式将运行结果上传到仓库的 Actions 选项卡。
    - name: 'Upload artifact'
-     uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+     uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
      with:
       name: SARIF file
       path: results.sarif
@@ -94,7 +94,7 @@ jobs:
    # 将结果上传到 GitHub 的代码扫描仪表板（可选）。
    # 注释掉将禁用将结果上传到您的仓库的代码扫描仪表板
    - name: 'Upload to code-scanning'
-     uses: github/codeql-action/upload-sarif@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
+     uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
      with:
       sarif_file: results.sarif
    - name: Audit - Results uploaded to code scanning
@@ -104,7 +104,7 @@ jobs:
        echo "Timestamp: $(date -u)" >> audit.log
 
    - name: Upload audit log
-     uses: actions/upload-artifact@v4
+     uses: actions/upload-artifact@v7
      with:
        name: scorecard-audit-log
        path: audit.log
