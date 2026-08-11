@@ -23,7 +23,11 @@ import { GeneralBasicOCRRequest, GeneralBasicOCRResponse } from '../../type';
  * 自定义错误类，用于表示OCR相关的特定错误
  */
 export class OCRError extends Error {
-  constructor(message: string, public readonly code?: string, public readonly details?: any) {
+  constructor(
+    message: string,
+    public readonly code?: string,
+    public readonly details?: any
+  ) {
     super(message);
     this.name = 'OCRError';
   }
@@ -37,17 +41,17 @@ export interface GeneralBasicOCRClientConfig {
    * 腾讯云SecretId
    */
   secretId: string;
-  
+
   /**
    * 腾讯云SecretKey
    */
   secretKey: string;
-  
+
   /**
    * 区域，默认为ap-beijing
    */
   region?: string;
-  
+
   /**
    * 端点URL，默认为https://ocr.tencentcloudapi.com
    */
@@ -71,14 +75,14 @@ export class GeneralBasicOCRClient {
   constructor(config: GeneralBasicOCRClientConfig) {
     this.auth = new TencentCloudAuth({
       secretId: config.secretId,
-      secretKey: config.secretKey
+      secretKey: config.secretKey,
     });
   }
-    /**
-     * 通用印刷体OCR
-   * 
+  /**
+   * 通用印刷体OCR
+   *
    * 对图片进行通用印刷体OCR识别，返回图片中的文字内容和位置信息。
-   * 
+   *
    * @param req 通用印刷体OCR请求参数
    * @param cb 回调函数，可选
    * @returns Promise<GeneralBasicOCRResponse>
@@ -88,7 +92,7 @@ export class GeneralBasicOCRClient {
     cb?: (error: OCRError | null, rep: GeneralBasicOCRResponse) => void
   ): Promise<GeneralBasicOCRResponse> {
     let timeoutId: NodeJS.Timeout | undefined;
-    
+
     try {
       // 生成鉴权签名
       const headers = this.auth.generateAuthorization({
@@ -98,7 +102,7 @@ export class GeneralBasicOCRClient {
         service: this.service,
         action: 'GeneralBasicOCR',
         version: this.version,
-        region: this.region
+        region: this.region,
       });
 
       // 设置请求超时
@@ -110,9 +114,9 @@ export class GeneralBasicOCRClient {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(req),
-        signal: controller.signal
+        signal: controller.signal,
       });
-      
+
       clearTimeout(timeoutId);
       timeoutId = undefined;
 
@@ -127,7 +131,7 @@ export class GeneralBasicOCRClient {
 
       // 解析响应
       const result: any = await response.json();
-      
+
       // 检查腾讯云API是否返回错误
       if (result.Error) {
         throw new OCRError(
@@ -136,12 +140,12 @@ export class GeneralBasicOCRClient {
           result.Error
         );
       }
-      
+
       // 腾讯云API响应格式为 { Response: { ... } }，需要提取Response字段
       if (!result.Response) {
         throw new OCRError('Invalid API response format', 'INVALID_RESPONSE', result);
       }
-      
+
       const typedResult = result.Response as GeneralBasicOCRResponse;
 
       // 执行回调函数
@@ -155,10 +159,10 @@ export class GeneralBasicOCRClient {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
-      
+
       // 创建统一的错误对象
       let ocrError: OCRError;
-      
+
       if (error instanceof OCRError) {
         ocrError = error;
       } else if (error instanceof Error) {
@@ -172,7 +176,7 @@ export class GeneralBasicOCRClient {
         // 处理其他类型的错误
         ocrError = new OCRError('Unknown error', 'UNKNOWN_ERROR', { originalError: error });
       }
-      
+
       // 执行回调函数
       if (cb) {
         cb(ocrError, {} as GeneralBasicOCRResponse);

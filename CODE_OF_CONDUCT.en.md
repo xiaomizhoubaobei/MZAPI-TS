@@ -27,15 +27,18 @@ Examples of unacceptable behavior by participants include:
 Given that this project is a multi-cloud provider TypeScript SDK, we especially require contributors to adhere to the following guidelines:
 
 1. **Cloud Service Authentication Information Security**:
+
    - It is strictly forbidden to include real SecretId, SecretKey, or other authentication credentials from any cloud provider in code, documentation, or any commits
    - If authentication information is needed in test code, environment variables or dedicated configuration files must be used, and these files must be ensured not to be committed to the version control system
 
 2. **Code Quality Requirements**:
+
    - All TypeScript code must provide complete type definitions
    - Follow the existing code style and structure in the project
    - Ensure ESLint and Prettier checks pass before committing
 
 3. **Documentation Guidelines**:
+
    - Chinese documentation must be provided for any new APIs or features
    - Example code should be clear and complete, helping users quickly understand and use the features
 
