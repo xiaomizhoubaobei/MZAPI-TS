@@ -22,13 +22,13 @@
  * 被如下接口引用：GeneralAccurateOCR, GeneralBasicOCR, GeneralEfficientOCR, GeneralFastOCR。
  **/
 export interface TextDetection {
-    DetectedText: string; // 识别出的文本行内容
-    Confidence: number; // 置信度 0 ~100
-    Polygon: Array<Coord> | null; // 文本行坐标，以四个顶点坐标表示；可能为 null
-    AdvancedInfo: string; // 扩展字段，GeneralBasicOcr 接口返回段落信息 Parag，包含 ParagNo
-    ItemPolygon: ItemCoord; // 文本行在旋转纠正后的图像像素坐标（左上角x, 左上角y, 宽width, 高height）
-    Words: Array<DetectedWords>; // 单字信息（单字字符+置信度），GeneralBasicOCR、GeneralAccurateOCR 支持
-    WordCoordPoint: Array<DetectedWordCoordPoint>; // 单字在原图中的四点坐标，GeneralBasicOCR、GeneralAccurateOCR 支持
+  DetectedText: string; // 识别出的文本行内容
+  Confidence: number; // 置信度 0 ~100
+  Polygon: Array<Coord> | null; // 文本行坐标，以四个顶点坐标表示；可能为 null
+  AdvancedInfo: string; // 扩展字段，GeneralBasicOcr 接口返回段落信息 Parag，包含 ParagNo
+  ItemPolygon: ItemCoord; // 文本行在旋转纠正后的图像像素坐标（左上角x, 左上角y, 宽width, 高height）
+  Words: Array<DetectedWords>; // 单字信息（单字字符+置信度），GeneralBasicOCR、GeneralAccurateOCR 支持
+  WordCoordPoint: Array<DetectedWordCoordPoint>; // 单字在原图中的四点坐标，GeneralBasicOCR、GeneralAccurateOCR 支持
 }
 
 /**
@@ -37,8 +37,8 @@ export interface TextDetection {
  * 被如下接口引用：AdvertiseOCR, ArithmeticOCR, CarInvoiceOCR, EnglishOCR, ExtractDocBasic, ExtractDocMulti, ExtractDocMultiPro, GeneralAccurateOCR, GeneralBasicOCR, GeneralEfficientOCR, GeneralFastOCR, GeneralHandwritingOCR, HandwritingEssayOCR, QrcodeOCR, QuestionOCR, QuestionSplitLayoutOCR, QuestionSplitOCR, RecognizeFormulaOCR, RecognizeGeneralCardWarn, RecognizeGeneralInvoice, RecognizeGeneralTextImageWarn, RecognizeTableAccurateOCR, RecognizeTableOCR, TableOCR, VatInvoiceOCR。
  **/
 export interface Coord {
-    X: number; // 横坐标
-    Y: number; // 纵坐标
+  X: number; // 横坐标
+  Y: number; // 纵坐标
 }
 
 /**
@@ -47,10 +47,10 @@ export interface Coord {
  * 被如下接口引用：ArithmeticOCR, BusinessCardOCR, EduPaperOCR, GeneralAccurateOCR, GeneralBasicOCR, GeneralEfficientOCR, GeneralFastOCR, SmartStructuralOCR。
  **/
 export interface ItemCoord {
-    X: number; // 左上角x
-    Y: number; // 左上角y
-    Width: number; // 宽width
-    Height: number; // 高height
+  X: number; // 左上角x
+  Y: number; // 左上角y
+  Width: number; // 宽width
+  Height: number; // 高height
 }
 
 /**
@@ -59,8 +59,8 @@ export interface ItemCoord {
  * 被如下接口引用：GeneralAccurateOCR, GeneralBasicOCR, GeneralEfficientOCR, GeneralFastOCR。
  **/
 export interface DetectedWords {
-    Confidence: number; // 置信度 0 ~100
-    Character: string; // 候选字Character
+  Confidence: number; // 置信度 0 ~100
+  Character: string; // 候选字Character
 }
 
 /**
@@ -69,5 +69,5 @@ export interface DetectedWords {
  * 被如下接口引用：GeneralAccurateOCR, GeneralBasicOCR, GeneralEfficientOCR, GeneralFastOCR。
  **/
 export interface DetectedWordCoordPoint {
-    WordCoordinate: Array<Coord>; // 单字在原图中的坐标，以四个顶点坐标表示，以左上角为起点，顺时针返回
+  WordCoordinate: Array<Coord>; // 单字在原图中的坐标，以四个顶点坐标表示，以左上角为起点，顺时针返回
 }
