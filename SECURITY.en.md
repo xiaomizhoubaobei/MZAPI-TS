@@ -3,7 +3,7 @@
 ## Supported Versions
 
 | Version | Supported          |
-|---------|--------------------|
+| ------- | ------------------ |
 | 0.0.x   | :white_check_mark: |
 
 ## Reporting Security Vulnerabilities
@@ -75,16 +75,19 @@ The project uses environment variables to manage sensitive configuration informa
 As this project is a multi-cloud provider TypeScript SDK, we pay special attention to the following API security practices:
 
 1. **Authentication Information Protection**:
+
    - Securely manage cloud provider authentication credentials in client code
    - Avoid leaking authentication information in code, configuration, or logs
    - Implement appropriate authentication credential rotation mechanisms
 
 2. **Request Signing**:
+
    - Ensure all API requests are verified using appropriate signing algorithms
    - Regularly review and update signing algorithms to ensure secure hash algorithms are used
    - Verify the integrity of API responses
 
 3. **Data Encryption**:
+
    - Encrypt sensitive data in transit
    - Implement end-to-end encryption mechanisms
    - Use industry-standard encryption algorithms
@@ -97,27 +100,32 @@ As this project is a multi-cloud provider TypeScript SDK, we pay special attenti
 ## Vulnerability Classification and Severity
 
 ### Critical
+
 - Vulnerabilities that lead to authentication information leakage
 - Vulnerabilities that allow unauthorized access to user data
 - Vulnerabilities that could cause service interruption
 
 ### High
+
 - Vulnerabilities that could lead to data leakage
 - Vulnerabilities that allow privilege escalation
 - Vulnerabilities that could affect service availability
 
 ### Medium
+
 - Information leakage vulnerabilities that do not contain sensitive data
 - Vulnerabilities that could affect partial functionality
 - Security issues caused by configuration errors
 
 ### Low
+
 - Information leakage vulnerabilities with non-sensitive data
 - Configuration recommendations or best practice issues
 
 ## Security Updates
 
 We commit to:
+
 - For critical and high vulnerabilities, release patches or mitigation measures within 72 hours
 - For medium vulnerabilities, assess and develop a fix plan within 7 days
 - For low vulnerabilities, fix in the next version
