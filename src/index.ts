@@ -1,1 +1,1 @@
-export * from "./tencent";
+export * from './tencent';
