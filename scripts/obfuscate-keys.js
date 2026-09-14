@@ -15,7 +15,7 @@ function isSafePath(filePath, baseDir) {
   // 解析绝对路径
   const resolvedPath = path.resolve(filePath);
   const resolvedBaseDir = path.resolve(baseDir);
-  
+
   // 检查文件是否在基准目录内
   return resolvedPath.startsWith(resolvedBaseDir);
 }
@@ -43,13 +43,13 @@ function obfuscateValue(value, keyName, userIdentityKeys) {
   if (typeof value !== 'string' || typeof keyName !== 'string') {
     throw new Error('Invalid input: value and keyName must be strings');
   }
-  
+
   if (userIdentityKeys.has(keyName)) {
     // 用户身份密钥：保留前后四位，中间用*代替
     if (value.length > 8) {
-      return value.substring(0, 4) +
-        '*'.repeat(value.length - 8) +
-        value.substring(value.length - 4);
+      return (
+        value.substring(0, 4) + '*'.repeat(value.length - 8) + value.substring(value.length - 4)
+      );
     } else {
       return '*'.repeat(value.length);
     }
@@ -71,13 +71,13 @@ function obfuscateKeysWithAST(filePath, dryRun = false, baseDir = './src') {
     console.error('错误：文件路径必须是字符串');
     return;
   }
-  
+
   // 路径安全检查
   if (!isSafePath(filePath, baseDir)) {
     console.error(`错误：不安全的文件路径 ${filePath}`);
     return;
   }
-  
+
   // 文件类型检查
   if (!isSupportedFileType(filePath)) {
     console.error(`错误：不支持的文件类型 ${filePath}`);
@@ -102,27 +102,99 @@ function obfuscateKeysWithAST(filePath, dryRun = false, baseDir = './src') {
 
     // 定义需要模糊化的密钥名称
     const keyNames = new Set([
-      'secretId', 'secretKey', 'accessKeyId', 'accessKeySecret', 'apiKey', 'apiSecret',
-      'clientId', 'clientSecret', 'token', 'password', 'authKey', 'privateKey',
-      'publicKey', 'credential', 'authToken', 'sessionId', 'refreshToken', 'oauthToken',
-      'bearerToken', 'encryptionKey', 'signingKey', 'appKey', 'appSecret', 'consumerKey',
-      'consumerSecret', 'licenseKey', 'licenseId', 'securityToken', 'masterKey',
-      'serviceAccountKey', 'integrationKey', 'webhookSecret', 'databaseUrl',
-      'connectionString', 'secretToken', 'jwtSecret', 'jwtKey', 'encryptionKey',
-      'decryptionKey', 'hashKey', 'salt', 'iv', 'certificate', 'cert', 'sslKey',
-      'sslCertificate', 'oauthClientId', 'oauthClientSecret', 'ssoToken', 'apiToken',
-      'restApiKey', 'apiKeyId', 'apiAccessToken', 'graphApiKey', 'graphSecret',
-      'analyticsKey', 'trackingId', 'adUnitId', 'adClientId', 'adClientSecret',
-      'paymentKey', 'paymentSecret', 'merchantId', 'merchantKey',
+      'secretId',
+      'secretKey',
+      'accessKeyId',
+      'accessKeySecret',
+      'apiKey',
+      'apiSecret',
+      'clientId',
+      'clientSecret',
+      'token',
+      'password',
+      'authKey',
+      'privateKey',
+      'publicKey',
+      'credential',
+      'authToken',
+      'sessionId',
+      'refreshToken',
+      'oauthToken',
+      'bearerToken',
+      'encryptionKey',
+      'signingKey',
+      'appKey',
+      'appSecret',
+      'consumerKey',
+      'consumerSecret',
+      'licenseKey',
+      'licenseId',
+      'securityToken',
+      'masterKey',
+      'serviceAccountKey',
+      'integrationKey',
+      'webhookSecret',
+      'databaseUrl',
+      'connectionString',
+      'secretToken',
+      'jwtSecret',
+      'jwtKey',
+      'encryptionKey',
+      'decryptionKey',
+      'hashKey',
+      'salt',
+      'iv',
+      'certificate',
+      'cert',
+      'sslKey',
+      'sslCertificate',
+      'oauthClientId',
+      'oauthClientSecret',
+      'ssoToken',
+      'apiToken',
+      'restApiKey',
+      'apiKeyId',
+      'apiAccessToken',
+      'graphApiKey',
+      'graphSecret',
+      'analyticsKey',
+      'trackingId',
+      'adUnitId',
+      'adClientId',
+      'adClientSecret',
+      'paymentKey',
+      'paymentSecret',
+      'merchantId',
+      'merchantKey',
     ]);
 
     // 定义用于表示用户身份的密钥名称
     const userIdentityKeys = new Set([
-      'secretId', 'clientId', 'userId', 'username', 'email', 'phoneNumber',
-      'userToken', 'sessionToken', 'authToken', 'refreshToken', 'oauthToken',
-      'ssoToken', 'apiToken', 'restApiKey', 'apiKeyId', 'apiAccessToken',
-      'graphApiKey', 'graphSecret', 'analyticsKey', 'trackingId', 'adUnitId',
-      'paymentKey', 'paymentSecret', 'merchantId', 'merchantKey',
+      'secretId',
+      'clientId',
+      'userId',
+      'username',
+      'email',
+      'phoneNumber',
+      'userToken',
+      'sessionToken',
+      'authToken',
+      'refreshToken',
+      'oauthToken',
+      'ssoToken',
+      'apiToken',
+      'restApiKey',
+      'apiKeyId',
+      'apiAccessToken',
+      'graphApiKey',
+      'graphSecret',
+      'analyticsKey',
+      'trackingId',
+      'adUnitId',
+      'paymentKey',
+      'paymentSecret',
+      'merchantId',
+      'merchantKey',
     ]);
 
     let hasKeys = false;
@@ -138,17 +210,21 @@ function obfuscateKeysWithAST(filePath, dryRun = false, baseDir = './src') {
           // 检查属性值是否是字符串字面量
           if (t.isStringLiteral(path.node.value)) {
             hasKeys = true;
-            
+
             // 在上方添加注释说明
             const keyName = t.isIdentifier(path.node.key)
               ? path.node.key.name
               : path.node.key.value;
-              
+
             const comment = `// 注意：在实际使用时，应该填入您的真实${keyName}`;
             path.getStatementParent().addComment('leading', comment);
 
             // 对值进行模糊化处理
-            const obfuscatedValue = obfuscateValue(path.node.value.value, keyName, userIdentityKeys);
+            const obfuscatedValue = obfuscateValue(
+              path.node.value.value,
+              keyName,
+              userIdentityKeys
+            );
 
             path.node.value.value = obfuscatedValue;
             path.node.value.extra = {
@@ -192,7 +268,7 @@ function processDirectory(dir, dryRun = false, baseDir = './src') {
     console.error('错误：目录路径必须是字符串');
     return;
   }
-  
+
   // 路径安全检查
   if (!isSafePath(dir, baseDir)) {
     console.error(`错误：不安全的目录路径 ${dir}`);

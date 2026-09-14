@@ -110,10 +110,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo
             });
-            
+
             const previousRelease = releases.length > 0 ? releases[0] : null;
             let changelog = "### 本次发布包含以下变更\n\n";
-            
+
             if (previousRelease) {
               const { data: commits } = await github.rest.repos.compareCommits({
                 owner: context.repo.owner,
@@ -121,11 +121,11 @@ jobs:
                 base: previousRelease.tag_name,
                 head: context.sha
               });
-              
+
               const features = [];
               const fixes = [];
               const chores = [];
-              
+
               for (const commit of commits.commits) {
                 const message = commit.commit.message;
                 if (message.startsWith('feat:')) {
@@ -136,32 +136,32 @@ jobs:
                   chores.push(message.substring(6).trim());
                 }
               }
-              
+
               if (features.length > 0) {
                 changelog += "### 新特性\n";
                 features.forEach(f => changelog += `- ${f}\n`);
                 changelog += "\n";
               }
-              
+
               if (fixes.length > 0) {
                 changelog += "### 修复\n";
                 fixes.forEach(f => changelog += `- ${f}\n`);
                 changelog += "\n";
               }
-              
+
               if (chores.length > 0) {
                 changelog += "### 其他\n";
                 chores.forEach(c => changelog += `- ${c}\n`);
                 changelog += "\n";
               }
-              
+
               if (features.length === 0 && fixes.length === 0 && chores.length === 0) {
                 changelog += "没有找到符合格式的提交记录\n";
               }
             } else {
               changelog += "这是首次发布\n";
             }
-            
+
             core.setOutput('release_notes', changelog);
       - name: Audit - Release notes generated
         run: |
@@ -174,7 +174,7 @@ jobs:
           VERSION=${{ steps.get_version.outputs.version }}
           # 创建发布包
           tar -czf mzapi-ts-sdk-${VERSION}.tar.gz --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='dist' .
-          
+
           # 审计日志 - 记录发布包创建
           echo "Release archive created" >> audit.log
           echo "Archive name: mzapi-ts-sdk-${VERSION}.tar.gz" >> audit.log
@@ -208,10 +208,10 @@ jobs:
           VERSION=${{ steps.get_version.outputs.version }}
           # 为发布资产创建GPG签名
           gpg --armor --detach-sign mzapi-ts-sdk-${VERSION}.tar.gz
-          
+
           # 上传签名文件
           gh release upload ${VERSION} mzapi-ts-sdk-${VERSION}.tar.gz.asc
-          
+
           # 审计日志 - 记录资产签名和上传
           echo "Release assets signed and uploaded" >> audit.log
           echo "Signed asset: mzapi-ts-sdk-${VERSION}.tar.gz.asc" >> audit.log
@@ -259,7 +259,7 @@ jobs:
           - **证明 URL**: $ATTESTATION_URL
           - **证明文件路径**: $BUNDLE_PATH
           "
-          
+
           # 审计日志 - 记录Release更新
           echo "GitHub Release updated with attestation details" >> audit.log
           echo "Attestation URL: $ATTESTATION_URL" >> audit.log
