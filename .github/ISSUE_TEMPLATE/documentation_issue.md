@@ -4,7 +4,6 @@ about: 报告文档中的错误或改进建议
 title: '[Docs]: '
 labels: documentation
 assignees: ''
-
 ---
 
 **文档问题描述**
@@ -12,6 +11,7 @@ assignees: ''
 
 **文档位置**
 请提供有问题的文档位置，例如：
+
 - README.md
 - API 文档
 - Wiki 页面
