@@ -3,7 +3,7 @@
 ## Supported Versions
 
 | Version | Supported          |
-|---------|--------------------|
+| ------- | ------------------ |
 | 0.0.x   | :white_check_mark: |
 
 ## Reporting Security Vulnerabilities
@@ -97,27 +97,32 @@ As this project is a multi-cloud provider TypeScript SDK, we pay special attenti
 ## Vulnerability Classification and Severity
 
 ### Critical
+
 - Vulnerabilities that lead to authentication information leakage
 - Vulnerabilities that allow unauthorized access to user data
 - Vulnerabilities that could cause service interruption
 
 ### High
+
 - Vulnerabilities that could lead to data leakage
 - Vulnerabilities that allow privilege escalation
 - Vulnerabilities that could affect service availability
 
 ### Medium
+
 - Information leakage vulnerabilities that do not contain sensitive data
 - Vulnerabilities that could affect partial functionality
 - Security issues caused by configuration errors
 
 ### Low
+
 - Information leakage vulnerabilities with non-sensitive data
 - Configuration recommendations or best practice issues
 
 ## Security Updates
 
 We commit to:
+
 - For critical and high vulnerabilities, release patches or mitigation measures within 72 hours
 - For medium vulnerabilities, assess and develop a fix plan within 7 days
 - For low vulnerabilities, fix in the next version
