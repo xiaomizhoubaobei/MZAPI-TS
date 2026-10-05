@@ -73,18 +73,9 @@ ${HashedCanonicalRequest}`;
       .createHmac('sha256', 'TC3' + this.secretKey)
       .update(date)
       .digest();
-    const SecretService = crypto
-      .createHmac('sha256', SecretDate)
-      .update(config.service)
-      .digest();
-    const SecretSigning = crypto
-      .createHmac('sha256', SecretService)
-      .update('tc3_request')
-      .digest();
-    const Signature = crypto
-      .createHmac('sha256', SecretSigning)
-      .update(StringToSign)
-      .digest('hex');
+    const SecretService = crypto.createHmac('sha256', SecretDate).update(config.service).digest();
+    const SecretSigning = crypto.createHmac('sha256', SecretService).update('tc3_request').digest();
+    const Signature = crypto.createHmac('sha256', SecretSigning).update(StringToSign).digest('hex');
 
     // 4. 拼接Authorization
     const Authorization = `${Algorithm} Credential=${this.secretId}/${CredentialScope}, SignedHeaders=${SignedHeaders}, Signature=${Signature}`;
