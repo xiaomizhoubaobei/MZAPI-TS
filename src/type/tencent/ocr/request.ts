@@ -18,49 +18,49 @@
 
 /**
  * 通用印刷体OCR请求参数
- * 
+ *
  * 支持PNG、JPG、JPEG、BMP、PDF格式的图片/PDF识别
  * 图片/PDF经Base64编码后不超过 10M，分辨率建议600*800以上
  */
 export interface GeneralBasicOCRRequest {
   /**
    * 图片/PDF的 Base64 值
-   * 
+   *
    * 要求图片/PDF经Base64编码后不超过 10M，分辨率建议600*800以上，
    * 支持PNG、JPG、JPEG、BMP、PDF格式。
-   * 
+   *
    * 图片的 ImageUrl、ImageBase64 必须提供一个，如果都提供，只使用 ImageUrl。
-   * 
+   *
    * 示例值：/9j/4AAQSkZJRg.....s97n//2Q==
    */
   ImageBase64?: string;
 
   /**
    * 图片/PDF的 Url 地址
-   * 
+   *
    * 要求图片/PDF经Base64编码后不超过 10M，分辨率建议600*800以上，
    * 支持PNG、JPG、JPEG、BMP、PDF格式。
-   * 
+   *
    * 图片下载时间不超过 3 秒。图片存储于腾讯云的 Url 可保障更高的下载速度和稳定性，
    * 建议图片存储于腾讯云。非腾讯云存储的 Url 速度和稳定性可能受一定影响。
-   * 
+   *
    * 示例值：https://ocr-demo-1254418846.cos.ap-guangzhou.myqcloud.com/general/GeneralBasicOCR/GeneralBasicOCR1.jpg
    */
   ImageUrl?: string;
 
   /**
    * 保留字段
-   * 
+   *
    * 示例值：scene
    */
   Scene?: string;
 
   /**
    * 识别语言类型
-   * 
+   *
    * 支持自动识别语言类型，同时支持自选语言种类，默认中英文混合(zh)，
    * 各种语言均支持与英文混合的文字识别。
-   * 
+   *
    * 可选值：
    * - zh：中英混合
    * - zh_rare：支持英文、数字、中文生僻字、繁体字，特殊符号等
@@ -85,14 +85,14 @@ export interface GeneralBasicOCRRequest {
    * - tha：泰语
    * - hi：印地语
    * - ara：阿拉伯语
-   * 
+   *
    * 示例值：zh
    */
   LanguageType?: string;
 
   /**
    * 是否开启PDF识别，默认值为false，开启后可同时支持图片和PDF的识别
-   * 
+   *
    * 示例值：true
    */
   IsPdf?: boolean;
@@ -100,14 +100,14 @@ export interface GeneralBasicOCRRequest {
   /**
    * 需要识别的PDF页面的对应页码，仅支持PDF单页识别，
    * 当上传文件为PDF且IsPdf参数值为true时有效，默认值为1
-   * 
+   *
    * 示例值：1
    */
   PdfPageNumber?: number;
 
   /**
    * 是否返回单字信息，默认关
-   * 
+   *
    * 示例值：false
    */
   IsWords?: boolean;
