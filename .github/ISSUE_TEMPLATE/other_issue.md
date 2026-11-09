@@ -4,7 +4,6 @@ about: 报告不属于其他类别的问题
 title: '[Other]: '
 labels: question
 assignees: ''
-
 ---
 
 **问题描述**

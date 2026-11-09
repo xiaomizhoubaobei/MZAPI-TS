@@ -5,7 +5,7 @@ export function fuzz(data: Buffer) {
   try {
     // 将模糊数据转换为字符串进行测试
     const inputString = data.toString('utf-8');
-    
+
     // 对可能的输入点进行模糊测试
     // 例如：OCR API 输入参数
     if (inputString.length > 0) {
